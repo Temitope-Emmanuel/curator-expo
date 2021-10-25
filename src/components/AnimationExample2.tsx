@@ -7,7 +7,7 @@ import { View, StatusBar, SafeAreaView, StyleSheet, useWindowDimensions } from "
 import { samples as oldSamples } from "../assets/data/waveform.json"
 import { PanGestureHandler, TapGestureHandler } from "react-native-gesture-handler";
 import MaskedView from "@react-native-community/masked-view"
-
+import {RenderingAudioContext,OfflineAudioContext} from "web-audio-engine"
 
 const samples = oldSamples.slice(0, 500)
 const STICK_WIDTH = 4;
@@ -58,6 +58,11 @@ const AnimationExample2 = () => {
 
     React.useEffect(() => {
         const interval = setInterval(() => updateProgress(), 150);
+        // const RenderingContext = AudioEngine.RenderingAudioContext
+        // const audioCtx = new RenderingContext()
+        const AudioContext = OfflineAudioContext
+        const audioContext = new AudioContext()
+        console.log("this is the audio context",{audioContext})
         return () => clearInterval(interval)
     }, [])
 
