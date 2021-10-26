@@ -10,8 +10,10 @@ import AntIcon from "@expo/vector-icons/AntDesign"
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5"
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons"
 import ActionSheet from "../components/ActionSheet"
+import * as DocumentPicker from "expo-document-picker"
 import { AsyncStorageClass } from "./utils/AsyncStorage"
 import FAB from "../components/Fab"
+import { PLAYLIST_KEY } from "./utils/constants"
 
 const Home:React.FC<{
   navigation: StackNavigationProp<any>;
@@ -24,6 +26,21 @@ const Home:React.FC<{
   const [playlist, setPlayList] = React.useState<IMedia<"audio">[]>([])
   const [currentMedia, setCurrentMedia] = React.useState<IMedia<"audio">>()
 
+  const getPlaylistData = async () => {
+    const data = await asyncStorage.current?.getData()
+    if(data){
+      setPlayList(JSON.parse(data))
+    }
+  }
+
+  React.useEffect(() => {
+    asyncStorage.current = new AsyncStorageClass({
+      key:PLAYLIST_KEY,
+      toast
+    })
+    getPlaylistData()
+  },[])
+
   const handleCurrentMedia = React.useMemo(() =>
     (uri: number | string) => () => {
       const foundMedia = playlist.find(item => item.uri === uri)
@@ -35,7 +52,7 @@ const Home:React.FC<{
     , [playlist])
 
   const handleNavigation = (arg: string | number) => () => {
-    props.navigation.navigate("Media Detail", { uri: arg })
+    props.navigation.navigate("MediaDetail", { uri: arg })
   }
   const handleDelete = (id: string) => {
     const filteredPlaylist = playlist.filter(item => item.uri != id)
@@ -51,7 +68,20 @@ const Home:React.FC<{
     })
   }
 
-  const PickSingleDocument = () => {}
+  const PickSingleDocument = async () => {
+    try{
+      const res = await DocumentPicker.getDocumentAsync({
+        type:"audio/*"
+      })
+      console.log({res})
+      if(res.type === "success"){
+        asyncStorage.current.storeData(JSON.stringify([...playlist,res]))
+        setPlayList([...playlist as any,res as any])
+      }
+    }catch(err){
+      console.log("there's been an error",{err})
+    }
+  }
 
   return (
     <>
@@ -61,21 +91,21 @@ const Home:React.FC<{
         <FlatList data={playlist}
           style={styles.listContainer}
           renderItem={({ item }) => (
-            <SingleMedia {...item} onClick={handleNavigation(item.fileCopyUri)}
-              key={item.fileCopyUri} setMedia={handleCurrentMedia(item.uri)}
+            <SingleMedia {...item} onClick={handleNavigation(item.uri)}
+              key={item.uri} setMedia={handleCurrentMedia(item.uri)}
             />
-          )} keyExtractor={item => item.fileCopyUri}
+          )} keyExtractor={item => item.uri}
         />
         <FAB open={openFAB} toggle={toggleFAB}
           icons={[
             {
-              icon: <AntIcon name="addfolder" size={20} color="#0B0E11" />,
+              icon: <AntIcon name="addfolder" size={20} />,
               name: "New Folder",
               label: "This is the upload button",
               onPress: () => { console.log("This is the upload button") }
             },
             {
-              icon: <AntIcon name="upload" size={20} color="#0B0E11" />,
+              icon: <AntIcon name="upload" size={20} />,
               name: "Upload",
               label: "This is the upload button",
               onPress: PickSingleDocument
@@ -83,7 +113,7 @@ const Home:React.FC<{
           ]}
         />
         <ActionSheet
-          onOpen={openActionSheet} title={currentMedia?.title ?? ""}
+          onOpen={openActionSheet} title={currentMedia?.name ?? ""}
           onClose={closeActionSheet} open={isOpenActionSheet}
           items={[
             {

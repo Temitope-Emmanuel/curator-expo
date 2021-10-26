@@ -68,7 +68,9 @@ const FAB:React.FC<{
       <Fab 
         bgColor="#FD4D4D" onPress={toggle}
         right={30} bottom={10} 
-        icon={<AntIcon name="pluscircle" size={30} color="#0B0E11" />}
+        icon={<AntIcon name="pluscircle" size={30}
+        //  color="#0B0E11" 
+         />}
       />
     </Box>
   )

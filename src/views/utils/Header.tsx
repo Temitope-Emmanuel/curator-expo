@@ -25,7 +25,9 @@ const Header:React.FC<{
         <HStack style={styles.nav}>
         <HStack space={1} style={styles.subNav}>
           <AntIcon size={20} style={{ color: "#FD4D4D" }} name="book" />
-          <Heading color="#FD4D4D">
+          <Heading 
+          // color="#FD4D4D"
+          >
             Curator
           </Heading>
         </HStack>
