@@ -3,6 +3,7 @@ import Animated, {
     useSharedValue, useAnimatedGestureHandler,
     useAnimatedStyle, withTiming
 } from "react-native-reanimated"
+import {Box} from "native-base"
 import { View, StatusBar, SafeAreaView, StyleSheet, useWindowDimensions } from "react-native"
 import { samples as oldSamples } from "../assets/data/waveform.json"
 import { PanGestureHandler, TapGestureHandler } from "react-native-gesture-handler";
@@ -140,7 +141,7 @@ const AnimationExample2 = () => {
                             <Animated.View style={[{ flex: 1 }, maskAnimatedStyle]} >
                                 <MaskedView
                                     maskElement={
-                                        <View
+                                        <Box
                                             style={{
                                                 backgroundColor: "transparent",
                                                 flex: 1,
@@ -153,7 +154,7 @@ const AnimationExample2 = () => {
                                             <Animated.View style={bottomWavesAnimatedStyles}>
                                                 <WaveForm {...{ samples }} reversed />
                                             </Animated.View>
-                                        </View>
+                                        </Box>
                                     }
                                     style={{
                                         height: "100%",

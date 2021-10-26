@@ -2,10 +2,14 @@ import "react-native-gesture-handler"
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import Views from './src/views'
+import {NativeBaseProvider} from "native-base"
+
 
 export default function App() {
   return (
-    <Views/>
+    <NativeBaseProvider>
+      <Views/>
+    </NativeBaseProvider>
   );
 }
 
