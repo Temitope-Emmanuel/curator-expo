@@ -1,12 +1,12 @@
-import { Box, Text, useToast, useDisclose, Divider } from "native-base"
+import { Box, useToast, useDisclose, Divider } from "native-base"
 import React from "react"
 import { StyleSheet, FlatList } from "react-native"
-import {StackNavigationProp} from "@react-navigation/stack"
+import { StackNavigationProp } from "@react-navigation/stack"
 import AuthModal from "../components/AuthModal"
-import {IMedia} from "../models/Media"
+import { IMedia } from "../models/Media"
 import Header from "./utils/Header"
 import SingleMedia from "../components/SingleMedia"
-import {AntDesign} from "@expo/vector-icons"
+import { AntDesign } from "@expo/vector-icons"
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5"
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons"
 import ActionSheet from "../components/ActionSheet"
@@ -15,7 +15,7 @@ import { AsyncStorageClass } from "./utils/AsyncStorage"
 import FAB from "../components/Fab"
 import { PLAYLIST_KEY } from "./utils/constants"
 
-const Home:React.FC<{
+const Home: React.FC<{
   navigation: StackNavigationProp<any>;
 }> = (props) => {
   const toast = useToast()
@@ -28,18 +28,18 @@ const Home:React.FC<{
 
   const getPlaylistData = async () => {
     const data = await asyncStorage.current?.getData()
-    if(data){
+    if (data) {
       setPlayList(JSON.parse(data))
     }
   }
 
   React.useEffect(() => {
     asyncStorage.current = new AsyncStorageClass({
-      key:PLAYLIST_KEY,
+      key: PLAYLIST_KEY,
       toast
     })
     getPlaylistData()
-  },[])
+  }, [])
 
   const handleCurrentMedia = React.useMemo(() =>
     (uri: number | string) => () => {
@@ -49,7 +49,7 @@ const Home:React.FC<{
         setCurrentMedia(foundMedia)
       }
     }
-    , [playlist])
+  ,[playlist])
 
   const handleNavigation = (arg: string | number) => () => {
     props.navigation.navigate("MediaDetail", { uri: arg })
@@ -69,17 +69,17 @@ const Home:React.FC<{
   }
 
   const PickSingleDocument = async () => {
-    try{
+    try {
       const res = await DocumentPicker.getDocumentAsync({
-        type:"audio/*"
+        type: "audio/*"
       })
-      console.log({res})
-      if(res.type === "success"){
-        asyncStorage.current.storeData(JSON.stringify([...playlist,res]))
-        setPlayList([...playlist as any,res as any])
+      if (res.type === "success") {
+        asyncStorage.current.storeData(JSON.stringify([...playlist, res]))
+        setPlayList([...playlist as any, res as any])
       }
-    }catch(err){
-      console.log("there's been an error",{err})
+      toggleFAB()
+    } catch (err) {
+      console.log("there's been an error", { err })
     }
   }
 
@@ -100,7 +100,7 @@ const Home:React.FC<{
           icons={[
             {
               // icon: <Text>This is a text</Text>,
-              iconType:AntDesign,
+              iconType: AntDesign,
               icon: "addfolder",
               name: "New Folder",
               label: "This is the upload button",
@@ -108,7 +108,7 @@ const Home:React.FC<{
             },
             {
               // icon: <Text>This is a text</Text>,
-              iconType:AntDesign,
+              iconType: AntDesign,
               icon: "upload",
               name: "Upload",
               label: "This is the upload button",
@@ -122,17 +122,20 @@ const Home:React.FC<{
           items={[
             {
               label: "Share",
-              // icon: <MaterialCommunityIcon size={20} name="share" />,
+              icon: "share",
+              iconType: MaterialCommunityIcon,
               onPress: () => console.log("Clicked on the share button")
             },
             {
               label: "Delete",
-              // icon: <MaterialCommunityIcon size={20} name="delete-sweep" />,
+              icon: "delete-sweep",
+              iconType: MaterialCommunityIcon,
               onPress: () => handleDelete(currentMedia?.uri ?? "")
             },
             {
               label: "Add Tags",
-              // icon: <FontAwesome5Icon size={15} name="tags" />,
+              icon: "tags",
+              iconType: FontAwesome5Icon,
               onPress: () => console.log("Added tags")
             }
           ]}

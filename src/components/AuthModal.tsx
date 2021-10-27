@@ -4,8 +4,8 @@ import Input from "./Input"
 import Modal from "./Modal"
 import React from "react"
 import { useForm } from "react-hook-form"
-// import MaterialIcon from "@expo/vector-icons/MaterialIcons"
-// import AntIcon from "@expo/vector-icons/AntDesign"
+import {MaterialIcons} from "@expo/vector-icons"
+import {AntDesign} from "@expo/vector-icons"
 import PasswordInput from "./Password"
 
 interface InputProps {
@@ -69,11 +69,11 @@ const AuthModal: React.FC<{
                 handleToggle={toggleModal}
             >
                 <VStack space={2}>
-                    {/* <Input control={control} name="email"
+                    <Input control={control} name="email"
                         placeholder="Input Email"
                         rightIcon={
-                            <MaterialIcon name="email" />
-                        } /> */}
+                            <MaterialIcons name="email" />
+                        } />
                     <PasswordInput control={control} />
                     <Button isLoading={submitting || formState.isSubmitting || !formState.isValid}
                         onPress={handleSubmit(onSubmit)} isLoadingText="Creating User" >
@@ -83,13 +83,13 @@ const AuthModal: React.FC<{
                 <Text mx="auto" my="2">
                     Or
                 </Text>
-                {/* <Button variant="outline" disabled={submitting || formState.isSubmitting}
+                <Button variant="outline" disabled={submitting || formState.isSubmitting}
                     startIcon={
-                        <AntIcon name="google" />
+                        <AntDesign name="google" />
                     } onPress={submitWithGoogle}
                 >
                     Sign In with Google
-                </Button> */}
+                </Button>
             </Modal>
 
         )

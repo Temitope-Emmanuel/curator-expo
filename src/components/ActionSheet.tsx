@@ -1,9 +1,10 @@
 import React from "react"
-import {Actionsheet,Text} from "native-base"
+import {Actionsheet,Icon,Text} from "native-base"
 
 interface ItemType {
     label:string;
-    icon?:JSX.Element,
+    iconType?:any;
+    icon?:string;
     onPress:() => void;
 }
 
@@ -25,17 +26,12 @@ const ActionSheetComp:React.FC<{
                     <Text style={{textAlign:"left"}}>
                         {title}
                     </Text>
-                    {items.map(({label,onPress,icon},idx) => (
+                    {items.map(({label,onPress,iconType,icon},idx) => (
                         <Actionsheet.Item startIcon={
-                            icon ? icon : undefined
+                            icon ? <Icon as={iconType} size="6" name={icon} /> : undefined
                         } 
                         key={idx} onPress={onPress}>
-                            {/* <HStack alignItems="center" space={2}>
-                                
-                                <Text>
-                                </Text>
-                            </HStack> */}
-                                    {label}
+                            {label}
                         </Actionsheet.Item>
                     ))}
                     <Text>

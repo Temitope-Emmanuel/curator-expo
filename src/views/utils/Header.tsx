@@ -1,7 +1,7 @@
 import React from "react"
 import {StyleSheet} from "react-native"
 // import useFirebaseService from "@src/utils/Firebase/Firebase"
-// import AntIcon from "@expo/vector-icons/AntDesign"
+import {AntDesign} from "@expo/vector-icons"
 import { HStack, Heading, IconButton, Avatar } from "native-base"
 
 
@@ -24,9 +24,9 @@ const Header:React.FC<{
     return(
         <HStack style={styles.nav}>
         <HStack space={1} style={styles.subNav}>
-          {/* <AntIcon size={20} style={{ color: "#FD4D4D" }} name="book" /> */}
+          <AntDesign size={20} style={{ color: "#FD4D4D" }} name="book" />
           <Heading 
-          // color="#FD4D4D"
+          color="#FD4D4D"
           >
             Curator
           </Heading>

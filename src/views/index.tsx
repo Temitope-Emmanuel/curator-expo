@@ -26,10 +26,11 @@ const Router = () => {
                           close: FastIOSTransitionSpec,
                         },
                         headerStyle:{
-                          backgroundColor:"#0B0E11"
+                          backgroundColor:"#0B0E11",
                         },
                         headerTitleStyle:{
-                          color:"#FD4D4D"
+                          color:"#FD4D4D",
+                          display:"none"
                         },
                         headerBackTitleStyle:{
                           color:"#FD4D4D"
