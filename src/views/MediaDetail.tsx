@@ -11,6 +11,7 @@ import {StackNavigationProp} from "@react-navigation/stack"
 import { PLAYLIST_KEY } from "./utils/constants"
 import AudioEngine from "web-audio-engine"
 
+
 const MediaDetail:React.FC<{
     route:RouteProp<RootStackParamList,"Media Detail">;
     navigation:StackNavigationProp<RootStackParamList,"Media Detail">
@@ -77,8 +78,6 @@ const MediaDetail:React.FC<{
             start(currentMedia)
         }
     }, [currentMedia])
-
-    console.log("this is the current state",{state})
 
     return(
         <AnimationExample2/>

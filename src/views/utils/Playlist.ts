@@ -23,7 +23,6 @@ export class PlaylistClass {
         this.handleUpdate = handleStatusUpdate;
         this.currentMedia = currentMedia;
         this.init()
-        console.log(this.handleUpdate,handleStatusUpdate)
     }
 
     init() {
@@ -60,13 +59,31 @@ export class PlaylistClass {
         )
         this.playbackInstance = sound;
         this.handlePlaybackUpdate(status)
-        // console.log("this is handle status update",{handleStatusUpdate:this.handlePlaybackUpdate})
     }
 
-    handlePlaybackUpdate = async(status:AVPlaybackStatus) => {
-        this.handleUpdate(status)
+    handlePlaybackUpdate = async(status:AVPlaybackStatus | any) => {
+        this.handleUpdate({
+            ...status,
+            ...(status.durationMillis && {totalTime:this.getMMSSFromMillis(status.durationMillis)}),
+            ...(status.positionMillis && {currentTime:this.getMMSSFromMillis(status.positionMillis)}),
+            ...(status.playableDurationMillis && {playableTime:this.getMMSSFromMillis(status.playableDurationMillis)})
+        })
     }
 
+    padWithZero = (number:number) => {
+        const string = number.toString();
+        if(number < 10){
+            return "0" + string;
+        }
+        return string
+    }
+    getMMSSFromMillis(millis:number){
+        const totalSeconds = millis / 1000;
+        const seconds = Math.floor(totalSeconds % 60);
+        const minutes = Math.floor(totalSeconds / 60);
+        
+        return this.padWithZero(minutes) + ":" + this.padWithZero(seconds);
+    }
     async stop() {
         if(this.playbackInstance){
             await this.playbackInstance.unloadAsync()

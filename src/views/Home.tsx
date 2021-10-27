@@ -79,7 +79,11 @@ const Home: React.FC<{
       }
       toggleFAB()
     } catch (err) {
-      console.log("there's been an error", { err })
+      toast.show({
+        status:"error",
+        title:"Something went wrong when selecting file",
+        description:err.message ?? ""
+      })
     }
   }
 

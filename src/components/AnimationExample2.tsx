@@ -63,7 +63,6 @@ const AnimationExample2 = () => {
         // const audioCtx = new RenderingContext()
         const AudioContext = OfflineAudioContext
         const audioContext = new AudioContext()
-        console.log("this is the audio context",{audioContext})
         return () => clearInterval(interval)
     }, [])
 
