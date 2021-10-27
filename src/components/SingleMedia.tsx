@@ -3,7 +3,7 @@ import {StyleSheet} from "react-native"
 import { IMedia } from "../models/Media"
 import {Box,Text,HStack,Image} from "native-base"
 import TouchableScale from "react-native-touchable-scale"
-import MaterialIcons from "@expo/vector-icons/MaterialIcons"
+// import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 
 const SingleMedia:React.FC<IMedia<"audio"> & {
     setMedia:() => void;
@@ -34,10 +34,10 @@ const SingleMedia:React.FC<IMedia<"audio"> & {
                     </Box>
                 </HStack>
             </TouchableScale>
-            <MaterialIcons size={20} onPress={setMedia} 
+            {/* <MaterialIcons size={20} onPress={setMedia} 
                 color="#FD4D4D"
                 name="more-vert"
-            />
+            /> */}
         </HStack>
     )
 }

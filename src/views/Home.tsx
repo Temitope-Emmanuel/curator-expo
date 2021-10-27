@@ -6,7 +6,7 @@ import AuthModal from "../components/AuthModal"
 import {IMedia} from "../models/Media"
 import Header from "./utils/Header"
 import SingleMedia from "../components/SingleMedia"
-import AntIcon from "@expo/vector-icons/AntDesign"
+import {AntDesign} from "@expo/vector-icons"
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5"
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons"
 import ActionSheet from "../components/ActionSheet"
@@ -99,13 +99,17 @@ const Home:React.FC<{
         <FAB open={openFAB} toggle={toggleFAB}
           icons={[
             {
-              icon: <AntIcon name="addfolder" size={20} />,
+              // icon: <Text>This is a text</Text>,
+              iconType:AntDesign,
+              icon: "addfolder",
               name: "New Folder",
               label: "This is the upload button",
               onPress: () => { console.log("This is the upload button") }
             },
             {
-              icon: <AntIcon name="upload" size={20} />,
+              // icon: <Text>This is a text</Text>,
+              iconType:AntDesign,
+              icon: "upload",
               name: "Upload",
               label: "This is the upload button",
               onPress: PickSingleDocument
@@ -118,17 +122,17 @@ const Home:React.FC<{
           items={[
             {
               label: "Share",
-              icon: <MaterialCommunityIcon size={20} name="share" />,
+              // icon: <MaterialCommunityIcon size={20} name="share" />,
               onPress: () => console.log("Clicked on the share button")
             },
             {
               label: "Delete",
-              icon: <MaterialCommunityIcon size={20} name="delete-sweep" />,
+              // icon: <MaterialCommunityIcon size={20} name="delete-sweep" />,
               onPress: () => handleDelete(currentMedia?.uri ?? "")
             },
             {
               label: "Add Tags",
-              icon: <FontAwesome5Icon size={15} name="tags" />,
+              // icon: <FontAwesome5Icon size={15} name="tags" />,
               onPress: () => console.log("Added tags")
             }
           ]}
