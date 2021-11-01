@@ -8,12 +8,8 @@ import { View, StatusBar, SafeAreaView, StyleSheet, useWindowDimensions } from "
 import { samples as oldSamples } from "../assets/data/waveform.json"
 import { PanGestureHandler, TapGestureHandler } from "react-native-gesture-handler";
 import MaskedView from "@react-native-community/masked-view"
-import {RenderingAudioContext,OfflineAudioContext} from "web-audio-engine"
+import { STICK_FULL_WIDTH, STICK_WIDTH, STICK_MARGIN } from "../views/utils/constants"
 
-const samples = oldSamples.slice(0, 500)
-const STICK_WIDTH = 4;
-const STICK_MARGIN = 1;
-const STICK_FULL_WIDTH = STICK_WIDTH + STICK_MARGIN;
 
 const WaveForm: React.FC<{
     samples: number[];
@@ -42,29 +38,33 @@ function findNearestMultiple(n, multiple) {
 }
 
 
-const AnimationExample2 = () => {
+const AnimationExample2:React.FC<{
+    samples:number[];
+    toggleSetPlaying:() => void;
+    panX:Animated.SharedValue<number>;
+    playing: Animated.SharedValue<boolean>;
+}> = ({
+    samples,playing,
+    panX,toggleSetPlaying
+}) => {
     const { width } = useWindowDimensions();
-    const playing = useSharedValue(true)
     const sliding = useSharedValue(false)
-    const panX = useSharedValue(0)
+    // const panX = useSharedValue(0)
     const maxPanX = -width;
 
-    const updateProgress = () => {
-        'worklet';
+    // const updateProgress = () => {
+    //     'worklet';
 
-        if (playing.value && !sliding.value && panX.value > maxPanX) {
-            panX.value = withTiming(panX.value - STICK_FULL_WIDTH)
-        }
-    }
+    //     if (playing.value && !sliding.value && panX.value > maxPanX) {
+    //         const currentPanX = position.value*STICK_FULL_WIDTH
+    //         panX.value = withTiming(Number.isNaN(currentPanX) ? 1 : -currentPanX)
+    //     }
+    // }
 
-    React.useEffect(() => {
-        const interval = setInterval(() => updateProgress(), 150);
-        // const RenderingContext = AudioEngine.RenderingAudioContext
-        // const audioCtx = new RenderingContext()
-        const AudioContext = OfflineAudioContext
-        const audioContext = new AudioContext()
-        return () => clearInterval(interval)
-    }, [])
+    // React.useEffect(() => {
+    //     const interval = setInterval(() => updateProgress(), 1000);
+    //     return () => clearInterval(interval)
+    // }, [])
 
     const panGestureHandler = useAnimatedGestureHandler({
         onStart(_, context: {
@@ -95,7 +95,8 @@ const AnimationExample2 = () => {
 
     const tapGestureHandler = useAnimatedGestureHandler({
         onActive() {
-            playing.value = !playing.value;
+            toggleSetPlaying()
+            // playing.value = !playing.value;
         }
     })
 
@@ -129,9 +130,6 @@ const AnimationExample2 = () => {
     })
 
     return (
-        <>
-            <StatusBar barStyle="light-content" />
-            <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
                 <TapGestureHandler numberOfTaps={1}
                     onGestureEvent={tapGestureHandler}
                 >
@@ -176,8 +174,6 @@ const AnimationExample2 = () => {
                         </PanGestureHandler>
                     </Animated.View>
                 </TapGestureHandler>
-            </SafeAreaView>
-        </>
     )
 }
 

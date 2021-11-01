@@ -64,9 +64,12 @@ export class PlaylistClass {
     handlePlaybackUpdate = async(status:AVPlaybackStatus | any) => {
         this.handleUpdate({
             ...status,
-            ...(status.durationMillis && {totalTime:this.getMMSSFromMillis(status.durationMillis)}),
-            ...(status.positionMillis && {currentTime:this.getMMSSFromMillis(status.positionMillis)}),
-            ...(status.playableDurationMillis && {playableTime:this.getMMSSFromMillis(status.playableDurationMillis)})
+            ...(status.durationMillis && {
+                totalSeconds:this.totalSeconds(status.durationMillis),
+                totalTime:this.getMMSSFromMillis(status.durationMillis)
+            }),
+            ...(status.positionMillis && {currentTime:this.totalSeconds(status.positionMillis)}),
+            ...(status.playableDurationMillis && {playableTime:this.totalSeconds(status.playableDurationMillis)})
         })
     }
 
@@ -77,11 +80,13 @@ export class PlaylistClass {
         }
         return string
     }
+    totalSeconds = (millisSeconds:number) => {
+        return millisSeconds/1000;
+    }
     getMMSSFromMillis(millis:number){
-        const totalSeconds = millis / 1000;
+        const totalSeconds = this.totalSeconds(millis);
         const seconds = Math.floor(totalSeconds % 60);
         const minutes = Math.floor(totalSeconds / 60);
-        
         return this.padWithZero(minutes) + ":" + this.padWithZero(seconds);
     }
     async stop() {
