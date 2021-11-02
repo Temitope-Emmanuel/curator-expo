@@ -10,7 +10,7 @@ export class PlaylistClass {
     currentMedia:IMedia<'audio'> = defaultMedia;
     seeking:boolean;
     shouldPlayAtEndOfSeek:boolean;
-    playbackInstance:Audio.Sound | null = null;
+    playbackInstance:Audio.Sound = null;
     handleUpdate:ISetStatus<AVPlaybackStatus> = null;
     constructor({
         currentMedia,toast,handleStatusUpdate

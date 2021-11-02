@@ -12,7 +12,7 @@ import { PLAYLIST_KEY, STICK_FULL_WIDTH } from "./utils/constants"
 import * as FileSystem from "expo-file-system"
 import * as AudioEngine from "web-audio-engine"
 import {decode} from "base64-arraybuffer"
-import { useSharedValue, withTiming } from "react-native-reanimated";
+import { useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import { useWindowDimensions } from "react-native";
 
 const MediaDetail:React.FC<{
@@ -23,16 +23,14 @@ const MediaDetail:React.FC<{
 }) => {
     const [playlistArr,setPlaylistArr] = React.useState<number[]>([])
     const toast = useToast();
-    const playing = useSharedValue(false)
-    const [audioData,setAudioData] = React.useState(new Float32Array(0))
-    const audioCtx = React.useRef(null)
+    const [playing,setPlaying] = React.useState(false)
+    const derivedPlaying = useDerivedValue(() => {
+        return playing
+    },[playing])
     const [state,setState] = React.useState<AVPlaybackStatus>()
     const asyncStorage = React.useRef<AsyncStorageClass>()
     const playlist = React.useRef<PlaylistClass>()
-    const {isOpen:openAddNote,onToggle:toggleAddNote} = useDisclose()
-    const [volume,setVolume] = React.useState(1.0)
     const [currentMedia,setCurrentMedia] = React.useState<IMedia<"audio">>()
-
     const { width } = useWindowDimensions();
     const sliding = useSharedValue(false)
     const panX = useSharedValue(0)
@@ -40,7 +38,7 @@ const MediaDetail:React.FC<{
 
     const createAudioArr = (milliSeconds:number) => {
         const seconds = Math.ceil(milliSeconds/1000);
-        const array = new Array(seconds).fill("").map((item) => (
+        const array = new Array(seconds-1).fill("").map((item) => (
             Math.ceil(Math.random() * 50) + 40
         ))
         setPlaylistArr(array)
@@ -179,7 +177,7 @@ const MediaDetail:React.FC<{
     const updatePosition = (currentTime:number) => {
         'worklet';
 
-        if (playing.value && !sliding.value && panX.value > maxPanX) {
+        if (playing && !sliding.value && panX.value > maxPanX) {
             const currentPanX = currentTime * STICK_FULL_WIDTH
             panX.value = withTiming(Number.isNaN(currentPanX) ? 1 : -currentPanX)
         }
@@ -190,24 +188,36 @@ const MediaDetail:React.FC<{
             createAudioArr((state as any).durationMillis)
         }
         if((state as any)?.isPlaying){
-            playing.value = (state as any).didJustFinish ? true : (state as any).isPlaying
-            updatePosition((state as any).currentTime)
+            if((state as any).currentTime){
+                updatePosition((state as any).currentTime)
+            }
+            if((state as any)?.isPlaying !== playing){
+                const currentPlaying = (state as any).didJustFinish ? true : (state as any).isPlaying;
+                setPlaying(currentPlaying)
+            }
         }else{
-            if(playing.value){
-                playing.value = false
+            // Only update value if true
+            if(playing){
+                setPlaying(false)
             }
         }
     },[state])
-
-    const toggleSetPlaying = () => {
-        "worklet"
-        playing.value = !playing.value
-    }
     
+    const pauseMedia = async (shouldPlay:boolean) => {
+        if(playlist.current){
+            await playlist.current.playbackInstance?.setStatusAsync({
+                shouldPlay
+            })
+        }
+    }
+
+    const toggleSetPlaying = React.useCallback(() => {
+        pauseMedia(!playing)
+    },[playing])
 
     return(
         <Flex style={{flex:1,backgroundColor:"black"}}>
-            <WaveForm samples={playlistArr} playing={playing}
+            <WaveForm samples={playlistArr} playing={derivedPlaying}
              panX={panX} toggleSetPlaying={toggleSetPlaying}
             />
         </Flex>
