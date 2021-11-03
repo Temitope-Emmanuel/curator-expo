@@ -233,12 +233,12 @@ const MediaDetail:React.FC<{
     },[playing])
     
     const seekTo = async (positionNumber:number) => {
-        // if(playlist.current){
-        //     const response = await playlist.current.playbackInstance.setStatusAsync({
-        //         positionMillis:positionNumber
-        //     })
-        //     console.log("this is the response",{response,positionNumber})
-        // }
+        if(playlist.current){
+            const response = await playlist.current.playbackInstance.setStatusAsync({
+                positionMillis:positionNumber
+            })
+            // console.log("this is the response",response,positionNumber)
+        }
     }
 
     return(

@@ -48,7 +48,7 @@ const MainWavefrom: React.FC<{
     playing: Readonly<Animated.SharedValue<boolean>>;
 }> = ({
     samples, playing,seek,bufferedPosition,
-    panX, toggleSetPlaying,setSliding
+    panX, toggleSetPlaying
 }) => {
         const { width } = useWindowDimensions();
         const maxPanX = -width;
@@ -113,9 +113,11 @@ const MainWavefrom: React.FC<{
                 onEnded={toggleSetPlaying}
             >
                 <Animated.View style={{ flex: 1 }}>
-                    <PanGestureHandler minDist={10}
+                    <PanGestureHandler minDist={100}
                     onEnded={({nativeEvent}) => {
-                        seek(nativeEvent.absoluteX as number/STICK_FULL_WIDTH)
+                        const newPosition = -(panX.value/STICK_FULL_WIDTH) * 1000;
+                        const seekTo = newPosition + (nativeEvent.translationX as number)
+                        seek(seekTo)
                     }}
                      onGestureEvent={panGestureHandler}
                     >
