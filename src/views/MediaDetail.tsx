@@ -1,14 +1,14 @@
 import React from "react"
 import WaveForm from "../components/WaveForm"
 import { AVPlaybackStatus} from "expo-av"
-import { useToast, useDisclose, Flex } from "native-base";
+import { useToast, Flex } from "native-base";
 import { AsyncStorageClass } from "./utils/AsyncStorage";
 import { PlaylistClass } from "./utils/Playlist";
 import { IMedia } from "../models/Media";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../models/route";
 import {StackNavigationProp} from "@react-navigation/stack"
-import { PLAYLIST_KEY, STICK_FULL_WIDTH } from "./utils/constants"
+import { MEDIA_KEY, PLAYLIST_KEY, STICK_FULL_WIDTH } from "./utils/constants"
 import * as FileSystem from "expo-file-system"
 import * as AudioEngine from "web-audio-engine"
 import {decode} from "base64-arraybuffer"
@@ -29,6 +29,7 @@ const MediaDetail:React.FC<{
     },[playing])
     const [state,setState] = React.useState<AVPlaybackStatus>()
     const asyncStorage = React.useRef<AsyncStorageClass>()
+    const playlistStorage = React.useRef<AsyncStorageClass>()
     const playlist = React.useRef<PlaylistClass>()
     const [currentMedia,setCurrentMedia] = React.useState<IMedia<"audio">>()
     const { width } = useWindowDimensions();
@@ -160,12 +161,21 @@ const MediaDetail:React.FC<{
 
     React.useEffect(() => {
         asyncStorage.current = new AsyncStorageClass({
-            key: PLAYLIST_KEY,
+            key: MEDIA_KEY,
+            toast
+        })
+        playlistStorage.current = new AsyncStorageClass({
+            key:PLAYLIST_KEY,
             toast
         })
         getAudio()
         return () => {
             if (playlist.current) {
+                // playlistStorage.current.addData({
+                //     id:currentMedia.name,
+                //     uri:currentMedia.uri,
+                //     // position:(state as any)?.positionMillis
+                // })
                 playlist.current?.stop()
             }
         }

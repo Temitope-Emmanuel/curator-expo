@@ -11,6 +11,7 @@ export interface IMedia<T extends MediaType> {
     // fileCopyUri:string;
     // uri:string;
     name:string;
+    id:string;
     size:number;
     uri:string;
     description?:string;
@@ -19,6 +20,7 @@ export interface IMedia<T extends MediaType> {
 export const defaultMedia:IMedia<"audio"> = {
     name:"",
     description:"",
+    id:"",
     // fileCopyUri:"",
     size:0,
     // title:"",

@@ -13,7 +13,7 @@ import ActionSheet from "../components/ActionSheet"
 import * as DocumentPicker from "expo-document-picker"
 import { AsyncStorageClass } from "./utils/AsyncStorage"
 import FAB from "../components/Fab"
-import { PLAYLIST_KEY } from "./utils/constants"
+import { MEDIA_KEY } from "./utils/constants"
 
 const Home: React.FC<{
   navigation: StackNavigationProp<any>;
@@ -35,7 +35,7 @@ const Home: React.FC<{
 
   React.useEffect(() => {
     asyncStorage.current = new AsyncStorageClass({
-      key: PLAYLIST_KEY,
+      key: MEDIA_KEY,
       toast
     })
     getPlaylistData()
@@ -49,23 +49,15 @@ const Home: React.FC<{
         setCurrentMedia(foundMedia)
       }
     }
-  ,[playlist])
+    , [playlist])
 
   const handleNavigation = (arg: string | number) => () => {
     props.navigation.navigate("MediaDetail", { uri: arg })
   }
   const handleDelete = (id: string) => {
-    const filteredPlaylist = playlist.filter(item => item.uri != id)
-    asyncStorage.current?.storeData(JSON.stringify(filteredPlaylist)).then(() => {
-      setPlayList(filteredPlaylist)
-      closeActionSheet()
-    }).catch(err => {
-      toast.show({
-        title: "Something went wrong",
-        status: "error",
-        description: `Error:${err.message}`
-      })
-    })
+    const newLocalData = asyncStorage.current?.removeData(id)
+    setPlayList(newLocalData)
+    closeActionSheet()
   }
 
   const PickSingleDocument = async () => {
@@ -74,15 +66,16 @@ const Home: React.FC<{
         type: "audio/*"
       })
       if (res.type === "success") {
-        asyncStorage.current.storeData(JSON.stringify([...playlist, res]))
-        setPlayList([...playlist as any, res as any])
+        const { type, ...newAudio } = res
+        const newData = await asyncStorage.current.addData({ ...newAudio, id: newAudio.uri })
+        setPlayList(newData)
       }
       toggleFAB()
     } catch (err) {
       toast.show({
-        status:"error",
-        title:"Something went wrong when selecting file",
-        description:err.message ?? ""
+        status: "error",
+        title: "Something went wrong when selecting file",
+        description: err.message ?? ""
       })
     }
   }
