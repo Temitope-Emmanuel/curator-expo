@@ -1,29 +1,42 @@
+import React from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IMedia } from "../../models/Media";
+import { IMedia,IMediaPlaylist } from "../../models/Media";
 import { IToastProps } from "../../models/Toast";
 
-export class AsyncStorageClass {
+type StorageType = IMedia<"audio"> | IMediaPlaylist
+type AcceptedKey = "@@media" | "@@playlist"
+type ISetStatus<K> = React.Dispatch<React.SetStateAction<K>>;
+
+class AsyncStorageClass {
   key: string;
+  storage:StorageType[];
+  setStorage:ISetStatus<StorageType[]>;
   toast: IToastProps;
-  localData: IMedia<"audio">[];
   constructor({
     key,
     toast,
+    storage,
+    setStorage
   }: {
-    key: "@@media" | "@@playlist";
+    key: AcceptedKey;
+    storage:StorageType[]
+    setStorage:ISetStatus<StorageType[]>;
     toast: IToastProps;
   }) {
     this.key = key;
+    this.storage = storage
+    this.setStorage = setStorage
     this.toast = toast;
     this.init();
+    AsyncStorage.clear();
   }
 
-  init = async () => {
+  init = () => {
     try {
       AsyncStorage.getItem(this.key).then((data) => {
         if(data){
           const parsedResponse = JSON.parse(data)
-          this.localData = parsedResponse;
+          this.updateStorage(parsedResponse)
           if(parsedResponse.length){
             this.toast.show({
               title: "Data loaded",
@@ -31,7 +44,7 @@ export class AsyncStorageClass {
             });
           }
         }else{
-          this.localData = []
+          this.updateStorage([])
         }
       });
     } catch (err) {
@@ -43,11 +56,10 @@ export class AsyncStorageClass {
     }
   };
 
-  addData = async (value: IMedia<"audio">) => {
+  addData = async (value: StorageType) => {
     try{
-      const newData = [...this.localData,value];
+      const newData = [...this.storage,value];
       await this.storeData(newData);
-      return newData
     }catch(err){
       this.toast.show({
         title: `Error: unable to add data`,
@@ -57,19 +69,24 @@ export class AsyncStorageClass {
       });
     }
   };
+  
   removeData = (id: any) => {
-    const newData = this.localData.filter((item) => item.id != id);
+    const newData = this.storage.filter((item) => item.id != id);
     this.storeData(newData)
     return newData;
   };
 
+  updateStorage = (value:StorageType[]) => {
+    this.setStorage(value)
+    this.storage = value
+  }
+
   // For setting the asyncStorage
-  private storeData = async (value: IMedia<"audio">[]) => {
+  private storeData = async (value: StorageType[]) => {
     try {
       await AsyncStorage.setItem(this.key, JSON.stringify(value));
-      this.localData = value
+      this.updateStorage(value)
     } catch (err: any) {
-      console.log("there's been an err",{err})
       this.toast.show({
         title: `Error:${err.messsage}`,
         placement: "bottom",
@@ -78,9 +95,9 @@ export class AsyncStorageClass {
     }
   };
   // For accessing the asyncStorage
-  getData = async () => {
+  getData = async (id:string) => {
     try {
-      const value = await AsyncStorage.getItem(this.key);
+      const value = this.storage.find(item => item.id === id);
       return value;
     } catch (err: any) {
       this.toast.show({
@@ -93,4 +110,32 @@ export class AsyncStorageClass {
   deleteStorage = async () => {
     return AsyncStorage.removeItem(this.key);
   };
+}
+
+
+export const useAsyncStorage = ({
+  initialState,
+  toast,key
+}:{
+  toast:IToastProps;
+  key:AcceptedKey
+  initialState:StorageType[]
+}):[StorageType[],AsyncStorageClass] => {
+  const [storage,setStorage] = React.useState(initialState)
+  const asyncStorage = React.useRef<AsyncStorageClass>()
+
+  console.log("this is the storage",{storage})
+
+  React.useEffect(() => {
+    asyncStorage.current = new AsyncStorageClass({
+      key,
+      toast,
+      storage,
+      setStorage
+    })
+  },[])
+
+  return [
+    storage,asyncStorage.current
+  ]
 }

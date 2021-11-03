@@ -2,9 +2,9 @@ import React from "react"
 import WaveForm from "../components/WaveForm"
 import { AVPlaybackStatus} from "expo-av"
 import { useToast, Flex } from "native-base";
-import { AsyncStorageClass } from "./utils/AsyncStorage";
+// import { AsyncStorageClass } from "./utils/AsyncStorage";
 import { PlaylistClass } from "./utils/Playlist";
-import { IMedia } from "../models/Media";
+import { IMedia, IMediaPlaylist } from "../models/Media";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../models/route";
 import {StackNavigationProp} from "@react-navigation/stack"
@@ -28,8 +28,8 @@ const MediaDetail:React.FC<{
         return playing
     },[playing])
     const [state,setState] = React.useState<AVPlaybackStatus>()
-    const asyncStorage = React.useRef<AsyncStorageClass>()
-    const playlistStorage = React.useRef<AsyncStorageClass>()
+    // const asyncStorage = React.useRef<AsyncStorageClass>()
+    // const playlistStorage = React.useRef<AsyncStorageClass>()
     const playlist = React.useRef<PlaylistClass>()
     const [currentMedia,setCurrentMedia] = React.useState<IMedia<"audio">>()
     const { width } = useWindowDimensions();
@@ -50,14 +50,10 @@ const MediaDetail:React.FC<{
     }
 
     const getAudio = async () => {
-        const response = await asyncStorage.current?.getData()
-        if (response) {
-            const parsedResponse: IMedia<"audio">[] = JSON.parse(response)
-            const foundMedia = parsedResponse.find(item => item.uri === route.params.uri)
-            if (foundMedia?.uri) {
-                setCurrentMedia(foundMedia)
-            }
-        }
+        // const response = await asyncStorage.current?.getData(route.params.uri as string)
+        // if(response){
+        //     setCurrentMedia(response as IMedia<"audio">)
+        // }
     }
 
     const start = (media: IMedia<"audio">) => {
@@ -160,23 +156,23 @@ const MediaDetail:React.FC<{
     }
 
     React.useEffect(() => {
-        asyncStorage.current = new AsyncStorageClass({
-            key: MEDIA_KEY,
-            toast
-        })
-        playlistStorage.current = new AsyncStorageClass({
-            key:PLAYLIST_KEY,
-            toast
-        })
+        // asyncStorage.current = new AsyncStorageClass({
+        //     key: MEDIA_KEY,
+        //     toast
+        // })
+        // playlistStorage.current = new AsyncStorageClass({
+        //     key:PLAYLIST_KEY,
+        //     toast
+        // })
         getAudio()
         return () => {
             if (playlist.current) {
                 // playlistStorage.current.addData({
                 //     id:currentMedia.name,
                 //     uri:currentMedia.uri,
-                //     // position:(state as any)?.positionMillis
-                // })
-                playlist.current?.stop()
+                //     position:(state as any)?.positionMillis
+                // } as IMediaPlaylist)
+                // playlist.current?.stop()
             }
         }
     }, [])

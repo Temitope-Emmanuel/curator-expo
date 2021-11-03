@@ -11,52 +11,42 @@ import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5"
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons"
 import ActionSheet from "../components/ActionSheet"
 import * as DocumentPicker from "expo-document-picker"
-import { AsyncStorageClass } from "./utils/AsyncStorage"
+import { useAsyncStorage } from "./utils/AsyncStorage"
 import FAB from "../components/Fab"
 import { MEDIA_KEY } from "./utils/constants"
+
 
 const Home: React.FC<{
   navigation: StackNavigationProp<any>;
 }> = (props) => {
   const toast = useToast()
+  const [playlist,asyncStorage] = useAsyncStorage({
+    initialState:[],
+    key:"@@media",
+    toast
+  })
   const { isOpen: openFAB, onToggle: toggleFAB } = useDisclose()
-  const asyncStorage = React.useRef<AsyncStorageClass>()
   const { isOpen: openModal, onToggle: toggleModal } = useDisclose()
   const { isOpen: isOpenActionSheet, onOpen: openActionSheet, onClose: closeActionSheet } = useDisclose()
-  const [playlist, setPlayList] = React.useState<IMedia<"audio">[]>([])
   const [currentMedia, setCurrentMedia] = React.useState<IMedia<"audio">>()
 
-  const getPlaylistData = async () => {
-    const data = await asyncStorage.current?.getData()
-    if (data) {
-      setPlayList(JSON.parse(data))
-    }
-  }
-
   React.useEffect(() => {
-    asyncStorage.current = new AsyncStorageClass({
-      key: MEDIA_KEY,
-      toast
-    })
-    getPlaylistData()
-  }, [])
+  },[])
 
   const handleCurrentMedia = React.useMemo(() =>
     (uri: number | string) => () => {
       const foundMedia = playlist.find(item => item.uri === uri)
       if (foundMedia) {
+        setCurrentMedia(foundMedia as any)
         openActionSheet()
-        setCurrentMedia(foundMedia)
       }
-    }
-    , [playlist])
+    }, [playlist])
 
   const handleNavigation = (arg: string | number) => () => {
     props.navigation.navigate("MediaDetail", { uri: arg })
   }
   const handleDelete = (id: string) => {
-    const newLocalData = asyncStorage.current?.removeData(id)
-    setPlayList(newLocalData)
+    asyncStorage.removeData(id)
     closeActionSheet()
   }
 
@@ -67,8 +57,7 @@ const Home: React.FC<{
       })
       if (res.type === "success") {
         const { type, ...newAudio } = res
-        const newData = await asyncStorage.current.addData({ ...newAudio, id: newAudio.uri })
-        setPlayList(newData)
+        await asyncStorage.addData({ ...newAudio, id: newAudio.uri })
       }
       toggleFAB()
     } catch (err) {
@@ -88,7 +77,7 @@ const Home: React.FC<{
         <FlatList data={playlist}
           style={styles.listContainer}
           renderItem={({ item }) => (
-            <SingleMedia {...item} onClick={handleNavigation(item.uri)}
+            <SingleMedia {...(item as IMedia<"audio">)} onClick={handleNavigation(item.uri)}
               key={item.uri} setMedia={handleCurrentMedia(item.uri)}
             />
           )} keyExtractor={item => item.uri}
