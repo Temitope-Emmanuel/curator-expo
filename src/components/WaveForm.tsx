@@ -1,11 +1,10 @@
 import React from "react"
 import Animated, {
-    useSharedValue, useAnimatedGestureHandler,
+    useAnimatedGestureHandler,
     useAnimatedStyle, withTiming
 } from "react-native-reanimated"
 import { Box } from "native-base"
-import { View, StatusBar, SafeAreaView, StyleSheet, useWindowDimensions } from "react-native"
-import { samples as oldSamples } from "../assets/data/waveform.json"
+import { View, StyleSheet, useWindowDimensions } from "react-native"
 import { PanGestureHandler, TapGestureHandler } from "react-native-gesture-handler";
 import MaskedView from "@react-native-community/masked-view"
 import { STICK_FULL_WIDTH, STICK_WIDTH, STICK_MARGIN } from "../views/utils/constants"
@@ -38,26 +37,27 @@ function findNearestMultiple(n, multiple) {
 }
 
 
-const AnimationExample2: React.FC<{
+const MainWavefrom: React.FC<{
     samples: number[];
     toggleSetPlaying: () => void;
+    setSliding: (arg:boolean) => void;
+    seek:(arg:number) => void;
     panX: Animated.SharedValue<number>;
+    bufferedPosition: Animated.SharedValue<number>;
+    sliding:Animated.SharedValue<boolean>;
     playing: Readonly<Animated.SharedValue<boolean>>;
 }> = ({
-    samples, playing,
-    panX, toggleSetPlaying
+    samples, playing,seek,bufferedPosition,
+    panX, toggleSetPlaying,setSliding
 }) => {
         const { width } = useWindowDimensions();
-        const sliding = useSharedValue(false)
         const maxPanX = -width;
-        const [newString, setNewString] = React.useState("")
 
         const panGestureHandler = useAnimatedGestureHandler({
             onStart(_, context: {
                 startX: number
             }) {
                 context.startX = panX.value;
-                sliding.value = true;
             },
             onActive(event, context) {
                 const nextPanX = context.startX + event.translationX;
@@ -69,17 +69,8 @@ const AnimationExample2: React.FC<{
                 } else {
                     panX.value = nextPanX;
                 }
-            },
-            onEnd() {
-                panX.value = withTiming(
-                    findNearestMultiple(panX.value, STICK_FULL_WIDTH)
-                );
-
-                sliding.value = false;
-            },
+            }
         });
-
-
 
         const maskAnimatedStyle = useAnimatedStyle(() => {
             return {
@@ -94,7 +85,14 @@ const AnimationExample2: React.FC<{
 
         const playedAnimatedStyle = useAnimatedStyle(() => {
             return {
+                // Move the colors from right -> left
                 width: -panX.value
+            }
+        })
+
+        const bufferedAnimatedStyle = useAnimatedStyle(() => {
+            return{
+                width:bufferedPosition.value
             }
         })
 
@@ -112,10 +110,15 @@ const AnimationExample2: React.FC<{
 
         return (
             <TapGestureHandler numberOfTaps={2}
-                onBegan={toggleSetPlaying}
+                onEnded={toggleSetPlaying}
             >
                 <Animated.View style={{ flex: 1 }}>
-                    <PanGestureHandler onGestureEvent={panGestureHandler}>
+                    <PanGestureHandler minDist={10}
+                    onEnded={({nativeEvent}) => {
+                        seek(nativeEvent.absoluteX as number/STICK_FULL_WIDTH)
+                    }}
+                     onGestureEvent={panGestureHandler}
+                    >
                         <Animated.View style={[{ flex: 1 }, maskAnimatedStyle]} >
                             <MaskedView
                                 maskElement={
@@ -143,12 +146,19 @@ const AnimationExample2: React.FC<{
                                 <Animated.View
                                     style={[{
                                         ...StyleSheet.absoluteFillObject,
-                                        zIndex: 1,
+                                        zIndex: 2,
                                         backgroundColor: "#FF5836"
                                     }, playedAnimatedStyle]}
                                 />
+                                <Animated.View
+                                    style={[{
+                                        ...StyleSheet.absoluteFillObject,
+                                        zIndex:1,
+                                        backgroundColor:"white"
+                                    },bufferedAnimatedStyle]}
+                                />
                                 <View
-                                    style={{ flex: 1, backgroundColor: "white" }}
+                                    style={{ flex: 1, backgroundColor:"rgba(255,255,255,0.5)" }}
                                 />
                             </MaskedView>
                         </Animated.View>
@@ -175,4 +185,4 @@ const waveFormStyles = StyleSheet.create({
     },
 });
 
-export default React.memo(AnimationExample2)
+export default React.memo(MainWavefrom)

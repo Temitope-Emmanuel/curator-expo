@@ -32,8 +32,12 @@ const MediaDetail:React.FC<{
     const playlist = React.useRef<PlaylistClass>()
     const [currentMedia,setCurrentMedia] = React.useState<IMedia<"audio">>()
     const { width } = useWindowDimensions();
-    const sliding = useSharedValue(false)
+    const [sliding,setSliding] = React.useState(false)
+    const derivedSliding = useDerivedValue(() => {
+        return sliding
+    },[sliding])
     const panX = useSharedValue(0)
+    const bufferedPoint = useSharedValue(0)
     const maxPanX = -width;
 
     const createAudioArr = (milliSeconds:number) => {
@@ -173,23 +177,18 @@ const MediaDetail:React.FC<{
             // getFileInfo(currentMedia.uri)
         }
     }, [currentMedia])
-
-    const updatePosition = (currentTime:number) => {
-        'worklet';
-
-        if (playing && !sliding.value && panX.value > maxPanX) {
-            const currentPanX = currentTime * STICK_FULL_WIDTH
-            panX.value = withTiming(Number.isNaN(currentPanX) ? 1 : -currentPanX)
-        }
-    }
-
+    
     React.useEffect(() => {
         if(playlistArr.length <= 0 && (state as any)?.durationMillis){
             createAudioArr((state as any).durationMillis)
         }
-        if((state as any)?.isPlaying){
+        
+        if((state as any)?.didJustFinish || (state as any)?.isPlaying){
             if((state as any).currentTime){
                 updatePosition((state as any).currentTime)
+            }
+            if((state as any).playableDurationMillis){
+                updateBuffering((state as any).playableDurationMillis/1000)
             }
             if((state as any)?.isPlaying !== playing){
                 const currentPlaying = (state as any).didJustFinish ? true : (state as any).isPlaying;
@@ -202,23 +201,52 @@ const MediaDetail:React.FC<{
             }
         }
     },[state])
+
+    const updatePosition = (currentTime:number) => {
+        'worklet';
+        if (playing && !sliding && panX.value > maxPanX) {
+            const currentPanX = currentTime * STICK_FULL_WIDTH
+            panX.value = withTiming(Number.isNaN(currentPanX) ? 1 : -currentPanX)
+        }
+    }
+
+    const updateBuffering = (bufferedPointArg:number) => {
+        'worklet';
+        if(bufferedPointArg){
+            const currentBufferedPoint = bufferedPointArg * STICK_FULL_WIDTH;
+            bufferedPoint.value = withTiming(-currentBufferedPoint)
+        }
+    }
     
     const pauseMedia = async (shouldPlay:boolean) => {
         if(playlist.current){
-            await playlist.current.playbackInstance?.setStatusAsync({
-                shouldPlay
-            })
+            if(shouldPlay){
+                await playlist.current.playbackInstance.playAsync()
+            }else{
+                await playlist.current.playbackInstance.pauseAsync()
+            }
         }
     }
 
     const toggleSetPlaying = React.useCallback(() => {
         pauseMedia(!playing)
     },[playing])
+    
+    const seekTo = async (positionNumber:number) => {
+        // if(playlist.current){
+        //     const response = await playlist.current.playbackInstance.setStatusAsync({
+        //         positionMillis:positionNumber
+        //     })
+        //     console.log("this is the response",{response,positionNumber})
+        // }
+    }
 
     return(
         <Flex style={{flex:1,backgroundColor:"black"}}>
             <WaveForm samples={playlistArr} playing={derivedPlaying}
-             panX={panX} toggleSetPlaying={toggleSetPlaying}
+             setSliding={setSliding} toggleSetPlaying={toggleSetPlaying}
+             panX={panX} sliding={derivedSliding}
+             seek={seekTo} bufferedPosition={bufferedPoint}
             />
         </Flex>
     )

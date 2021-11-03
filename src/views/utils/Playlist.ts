@@ -61,7 +61,7 @@ export class PlaylistClass {
         this.handlePlaybackUpdate(status)
     }
 
-    handlePlaybackUpdate = async(status:AVPlaybackStatus | any) => {
+    handlePlaybackUpdate = async(status:AVPlaybackStatus | any) => {  
         this.handleUpdate({
             ...status,
             ...(status.durationMillis && {
