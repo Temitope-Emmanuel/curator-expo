@@ -28,7 +28,7 @@ class AsyncStorageClass {
     this.setStorage = setStorage
     this.toast = toast;
     this.init();
-    AsyncStorage.clear();
+    // AsyncStorage.clear()
   }
 
   init = () => {
@@ -58,6 +58,7 @@ class AsyncStorageClass {
 
   addData = async (value: StorageType) => {
     try{
+      console.log("this is the data",{value})
       const newData = [...this.storage,value];
       await this.storeData(newData);
     }catch(err){
@@ -123,8 +124,6 @@ export const useAsyncStorage = ({
 }):[StorageType[],AsyncStorageClass] => {
   const [storage,setStorage] = React.useState(initialState)
   const asyncStorage = React.useRef<AsyncStorageClass>()
-
-  console.log("this is the storage",{storage})
 
   React.useEffect(() => {
     asyncStorage.current = new AsyncStorageClass({

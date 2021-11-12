@@ -24,7 +24,6 @@ export class PlaylistClass {
         this.currentMedia = currentMedia;
         this.init()
     }
-
     init() {
         Audio.setAudioModeAsync({
             allowsRecordingIOS:false,
@@ -36,31 +35,39 @@ export class PlaylistClass {
             playThroughEarpieceAndroid:true
         })
     }
-
     async loadNewPlaybackInstance(media:IMedia<"audio">) {
-        if(this.playbackInstance != null){
-            await this.playbackInstance.unloadAsync()
-            this.playbackInstance = null;
+        try{
+            if(this.playbackInstance != null){
+                await this.playbackInstance.unloadAsync()
+                this.playbackInstance = null;
+            }
+            const initialPlayback:AVPlaybackSource = {
+                uri:media.uri,
+                localUri:media.uri
+            }
+            const initialStatus:AVPlaybackStatusToSet = {
+                shouldPlay:true,
+                rate:1.0,
+                shouldCorrectPitch:true,
+                volume:1.0,
+                isMuted:false,
+                isLooping:false
+            }
+            const {sound,status} = await Audio.Sound.createAsync(
+                initialPlayback,initialStatus
+                ,this.handlePlaybackUpdate
+            )
+            console.log("this is the status",{status})
+            this.playbackInstance = sound;
+            this.handlePlaybackUpdate(status)
+        }catch(err) {
+            this.toast.show({
+                title:"Unable to load audio",
+                description:err.message || "Something went wrong",
+                status:"error"
+            })
         }
-        const initialPlayback:AVPlaybackSource = {
-            uri:media.uri
-        }
-        const initialStatus:AVPlaybackStatusToSet = {
-            shouldPlay:true,
-            rate:1.0,
-            shouldCorrectPitch:true,
-            volume:1.0,
-            isMuted:false,
-            isLooping:false
-        }
-        const {sound,status} = await Audio.Sound.createAsync(
-            initialPlayback,initialStatus
-            ,this.handlePlaybackUpdate
-        )
-        this.playbackInstance = sound;
-        this.handlePlaybackUpdate(status)
     }
-
     handlePlaybackUpdate = async(status:AVPlaybackStatus | any) => {  
         this.handleUpdate({
             ...status,
@@ -72,7 +79,6 @@ export class PlaylistClass {
             ...(status.playableDurationMillis && {playableTime:this.totalSeconds(status.playableDurationMillis)})
         })
     }
-
     padWithZero = (number:number) => {
         const string = number.toString();
         if(number < 10){
@@ -92,11 +98,11 @@ export class PlaylistClass {
     async stop() {
         if(this.playbackInstance){
             await this.playbackInstance.unloadAsync()
-            this.toast.show({
-                title:"Successfully stopped audio",
-                status:"success"
-            })
-            this.playbackInstance = null
+            // this.toast.show({
+            //     title:"Successfully stopped audio",
+            //     status:"success"
+            // })
+            // this.playbackInstance = null
         }
     }
     

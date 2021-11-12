@@ -2,7 +2,7 @@ import React from "react"
 import {
     Box,
     IconButton,
-    Stagger, Fab, View, Icon
+    Stagger, Fab, Icon
 } from "native-base"
 import { AntDesign } from "@expo/vector-icons"
 

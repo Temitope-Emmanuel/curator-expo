@@ -1,4 +1,4 @@
-import { Box, useToast, useDisclose, Divider } from "native-base"
+import { Box, useToast, Text, useDisclose, Divider } from "native-base"
 import React from "react"
 import { StyleSheet, FlatList } from "react-native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -13,7 +13,6 @@ import ActionSheet from "../components/ActionSheet"
 import * as DocumentPicker from "expo-document-picker"
 import { useAsyncStorage } from "./utils/AsyncStorage"
 import FAB from "../components/Fab"
-import { MEDIA_KEY } from "./utils/constants"
 
 
 const Home: React.FC<{
@@ -29,9 +28,6 @@ const Home: React.FC<{
   const { isOpen: openModal, onToggle: toggleModal } = useDisclose()
   const { isOpen: isOpenActionSheet, onOpen: openActionSheet, onClose: closeActionSheet } = useDisclose()
   const [currentMedia, setCurrentMedia] = React.useState<IMedia<"audio">>()
-
-  React.useEffect(() => {
-  },[])
 
   const handleCurrentMedia = React.useMemo(() =>
     (uri: number | string) => () => {
@@ -53,8 +49,10 @@ const Home: React.FC<{
   const PickSingleDocument = async () => {
     try {
       const res = await DocumentPicker.getDocumentAsync({
-        type: "audio/*"
+        type: "audio/*",
+        copyToCacheDirectory:false
       })
+      console.log("this is the response",{res})
       if (res.type === "success") {
         const { type, ...newAudio } = res
         await asyncStorage.addData({ ...newAudio, id: newAudio.uri })
@@ -70,7 +68,7 @@ const Home: React.FC<{
   }
 
   return (
-    <>
+    <Box style={{position:"relative",flex:1,backgroundColor:"black"}} >
       <Box style={styles.root}>
         <Header toggleModal={toggleModal} />
         <Divider />
@@ -130,7 +128,7 @@ const Home: React.FC<{
       <AuthModal openModal={openModal}
         toggleModal={toggleModal}
       />
-    </>
+    </Box>
   )
 }
 

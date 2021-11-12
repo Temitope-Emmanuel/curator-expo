@@ -1,0 +1,73 @@
+
+        // Suspend functionality
+        const createAudioContext = async (base64String: any) => {
+
+            const audioCtx = new AudioEngine.default.WebAudioContext({
+                context: new AudioEngine.default.OfflineAudioContext()
+            })
+            const arrayBuffer = decode(base64String)
+
+            const channels = 1;
+            const frameCount = audioCtx.sampleRate * 1;
+
+            // Add arrayBuffer to audioBuffer
+            const createdBuffer = audioCtx.createBuffer(channels, frameCount, audioCtx.sampleRate)
+            const nowBuffering = createdBuffer.getChannelData(0)
+            for (let i = 0; i < createdBuffer.length; i++) {
+                nowBuffering[i] = arrayBuffer[i]
+            }
+
+            // Create a buffer source
+
+            const source = audioCtx.createBufferSource();
+            const analyser = audioCtx.analyser;
+
+            source.buffer = createdBuffer;
+            source.connect(analyser)
+            source.connect(audioCtx.destination)
+
+            source.start()
+
+            // console.log(createBuffer.length)
+
+            // const view = new Uint8Array(arrayBuffer)
+            // console.log(view.)
+            // console.log("This is the view",{view})
+            // const decodedData = await audioCtx.decodeAudioData(arrayBuffer)
+            // console.log(JSON.stringify(arrayBuffer,null,2))
+            // const audioBuffer = audioCtx.createBuffer(arrayBuffer)
+            // console.log("this is the audioBuffer",audioBuffer.getChannel())
+            // console.log(audioCtx.createBufferSource,audioCtx.createBuffer)
+
+
+            // console.log("this is the arrayBuffer",decodedData)
+            // console.log("This is the new Response",{newResponse})
+
+            // audioCtx.decodeAudioData(base64String).then(response => {
+            //     console.log("this is the response",{response})
+            // })
+
+            // console.log(base64String)
+            // const analyser = audioCtx.createAnalyser()
+            // const dataArray = new Float32Array(analyser.frequencyBinCount)
+            // console.log(audioCtx.decodeAudioData)
+
+            // const AudioCtx = AudioEngine.WebAudioContext
+            // const audioCtx = new AudioCtx({
+            //     context:new AudioCtx(),
+            //     destination:undefined
+            // })
+
+            // console.log({audioCtx})
+            // const audioData = audioCtx.exportAsAudioData();
+            // const analyser = audioCtx.createAnalyser()
+            // console.log("this is the audioCtx",JSON.stringify(audioData,null,2))
+            // const dataArray = new Float32Array(analyser.frequencyBinCount)
+            // const source = audioCtx.createMediaStreamSource(base64String)
+            // console.log("this is the dataArray",{source})
+            // source.connect(analyser)
+
+            // analyser.getFloatTimeDomainData(dataArray)
+
+            // console.log("this is the data array",{dataArray})
+        }
