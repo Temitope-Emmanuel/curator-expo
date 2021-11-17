@@ -1,7 +1,7 @@
 export type RootStackParamList = {
     Home: undefined;
-    AnimationExample2:undefined;
-    'Media Detail': {
+    Explore:undefined;
+    'MediaDetail': {
       uri: string | number;
     };
   };

@@ -1,30 +1,22 @@
 import React from "react"
 import { StyleSheet } from "react-native"
-import WaveForm from "../components/Waveform"
 import { AVPlaybackStatus } from "expo-av"
 import { useToast, View, Text } from "native-base";
 import { useAsyncStorage } from "./utils/AsyncStorage";
 import { PlaylistClass } from "./utils/Playlist";
 import { IMedia } from "../models/Media";
-import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../models/route";
-import { StackNavigationProp } from "@react-navigation/stack"
-import { STICK_FULL_WIDTH } from "./utils/constants"
+import { FULL_BAR_WIDTH } from "./utils/constants"
 import Animated, {
-    useAnimatedRef, useAnimatedScrollHandler,
+    useAnimatedRef,
     useSharedValue, withTiming
 } from "react-native-reanimated";
-import { Dimensions } from "react-native";
 import waveform from "../assets/data/waveform.json"
-import * as FileSystem from "expo-file-system"
-// import TabView from "../../src/components/TabView"
+import TabView from "../../src/components/TabView"
+import WaveFormContainer from "../components/WaveFormContainer";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
-const width = Dimensions.get("window")
-
-const MediaDetail: React.FC<{
-    route: RouteProp<RootStackParamList, "Media Detail">;
-    navigation: StackNavigationProp<RootStackParamList, "Media Detail">
-}> = ({
+const MediaDetail: React.FC<{} & BottomTabScreenProps<RootStackParamList,"MediaDetail">> = ({
     route
 }) => {
         const toast = useToast();
@@ -53,20 +45,19 @@ const MediaDetail: React.FC<{
         // useDerivedValue(() => {
         //     return sliding
         // }, [sliding])
-   
+
         const updateProgress = () => {
             "worklet";
-        
+
             if (scrollX) {
-              scrollX.value = withTiming(scrollX.value + (STICK_FULL_WIDTH));
+                scrollX.value = withTiming(scrollX.value + (FULL_BAR_WIDTH * 2));
             }
-          };
-        
-        
+        };
+
         const createAudioArr = (milliSeconds: number) => {
-            console.log("this is the milliseconds",milliSeconds)
             const seconds = Math.ceil(milliSeconds / 1000);
-            const array = waveform.samples.slice(0,seconds)
+            const array = waveform.samples.slice(0, seconds)
+            console.log(array.length)
             setPlaylistArr(array)
         }
 
@@ -92,16 +83,10 @@ const MediaDetail: React.FC<{
         }
 
         React.useEffect(() => {
-            // const getData = async () => {
-            //     // console.log(FileSystem.cacheDirectory)
-            //     const cache = await FileSystem.readDirectoryAsync(`${FileSystem.cacheDirectory}DocumenPicker`)
-            //     // const cache = await FileSystem.readAsStringAsync("file:///data/user/0/host.exp.exponent/cache/ExperienceData/%40kashakunin%2Ftodo-app/DocumentPicker/5f40f970-281c-489f-9747-71b07434372f.mp3")
-            //     console.log( "This is the cache",{cache})
-            // }
-            // getData()
-            // const interval = setInterval(() => updateProgress(), 1000);
-            // return () => clearInterval(interval);
-          
+            createAudioArr(100000)
+            const interval = setInterval(() => updateProgress(), 150);
+            return () => clearInterval(interval);
+
             // return () => {
             //     if (playlist.current) {
             //         playlist.current?.stop()
@@ -117,46 +102,45 @@ const MediaDetail: React.FC<{
             // }
         }, [])
 
-        React.useEffect(() => {
-            if (currentMedia?.uri && !state) {
-                start(currentMedia)
-                // getFileInfo(currentMedia.uri)
-            }
-        }, [currentMedia])
+        // React.useEffect(() => {
+        //     if (currentMedia?.uri && !state) {
+        //         // start(currentMedia)
+        //     }
+        // }, [currentMedia])
 
-        React.useEffect(() => {
-            if (playlistArr.length <= 0 && (state as any)?.durationMillis) {
-                createAudioArr((state as any).durationMillis)
-            }
+        // React.useEffect(() => {
+        //     if (playlistArr.length <= 0 && (state as any)?.durationMillis) {
+        //         createAudioArr((state as any).durationMillis)
+        //     }
 
-            if ((state as any)?.didJustFinish || (state as any)?.isPlaying) {
-                if ((state as any)?.didJustFinish) {
-                    // savedPlaylistDetail()
-                }
-                if ((state as any).currentTime) {
-                    updatePosition((state as any).currentTime)
-                }
-                if ((state as any).playableDurationMillis) {
-                    updateBuffering((state as any).playableDurationMillis / 1000)
-                }
-                if ((state as any)?.isPlaying !== playing) {
-                    const currentPlaying = (state as any).didJustFinish ? true : (state as any).isPlaying;
-                    setPlaying(currentPlaying)
-                }
-            } else {
-                // Only update value if true
-                if (playing) {
-                    setPlaying(false)
-                }
-            }
-        }, [state])
+        //     if ((state as any)?.didJustFinish || (state as any)?.isPlaying) {
+        //         if ((state as any)?.didJustFinish) {
+        //             // savedPlaylistDetail()
+        //         }
+        //         if ((state as any).currentTime) {
+        //             updatePosition((state as any).currentTime)
+        //         }
+        //         if ((state as any).playableDurationMillis) {
+        //             updateBuffering((state as any).playableDurationMillis / 1000)
+        //         }
+        //         if ((state as any)?.isPlaying !== playing) {
+        //             const currentPlaying = (state as any).didJustFinish ? true : (state as any).isPlaying;
+        //             setPlaying(currentPlaying)
+        //         }
+        //     } else {
+        //         // Only update value if true
+        //         if (playing) {
+        //             setPlaying(false)
+        //         }
+        //     }
+        // }, [state])
 
 
-        React.useEffect(() => {
-            if (mediaAsyncStorage && !currentMedia) {
-                getAudio()
-            }
-        }, [mediaAsyncStorage])
+        // React.useEffect(() => {
+        //     if (mediaAsyncStorage && !currentMedia) {
+        //         getAudio()
+        //     }
+        // }, [mediaAsyncStorage])
 
         // const savedPlaylistDetail = () => {
         //     return playlistAsyncStorage.addData({
@@ -174,16 +158,16 @@ const MediaDetail: React.FC<{
         const updatePosition = (currentTime: number) => {
             'worklet';
             if (playing && !sliding) {
-                const currentPanX = currentTime * STICK_FULL_WIDTH
+                const currentPanX = currentTime * FULL_BAR_WIDTH
                 scrollX.value = withTiming(Number.isNaN(currentPanX) ? 1 : currentPanX)
-                console.log("this is the scrollX",JSON.stringify(scrollX))
+                console.log("this is the scrollX", JSON.stringify(scrollX))
             }
         }
 
         const updateBuffering = (bufferedPointArg: number) => {
             'worklet';
             if (bufferedPointArg) {
-                const currentBufferedPoint = bufferedPointArg * STICK_FULL_WIDTH;
+                const currentBufferedPoint = bufferedPointArg * FULL_BAR_WIDTH;
                 bufferedPoint.value = withTiming(-currentBufferedPoint)
             }
         }
@@ -211,38 +195,11 @@ const MediaDetail: React.FC<{
         //     }
         // }
 
-        const scrollHandler = useAnimatedScrollHandler({
-            onScroll: ({ contentOffset: { x } }) => {
-                scrollX.value = x
-            }
-        })
-        // useDerivedValue(() => {
-        //     scrollTo(scrollRef, scrollX.value, 0, true)
-        // })
-
-        // console.log( "this is the waveform", {playlistArr})
-
+       
         return (
             <View style={styles.container}>
-                <View style={styles.content}>
-                    <Animated.ScrollView
-                        ref={scrollRef} showsHorizontalScrollIndicator={false}
-                        bounces={false} horizontal
-                        scrollEventThrottle={16} onScroll={scrollHandler}
-                    >
-                        <View style={{ flex: 1 }} >
-                            <WaveForm
-                                primaryColor="white" secondaryColor="#e6d0bb"
-                                waveform={playlistArr}
-                            />
-                            <View style={StyleSheet.absoluteFillObject}>
-                                <WaveForm progress={scrollX} waveform={playlistArr}
-                                    primaryColor="#e95f2a" secondaryColor="#f5c19f"
-                                />
-                            </View>
-                        </View>
-                    </Animated.ScrollView>
-                </View>
+                <WaveFormContainer waveform={waveform.samples} />
+                <TabView/>
             </View>
         )
     }

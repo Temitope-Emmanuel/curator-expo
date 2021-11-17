@@ -1,7 +1,6 @@
 import { Box, useToast, Text, useDisclose, Divider } from "native-base"
 import React from "react"
 import { StyleSheet, FlatList } from "react-native"
-import { StackNavigationProp } from "@react-navigation/stack"
 import AuthModal from "../components/AuthModal"
 import { IMedia } from "../models/Media"
 import Header from "./utils/Header"
@@ -13,11 +12,13 @@ import ActionSheet from "../components/ActionSheet"
 import * as DocumentPicker from "expo-document-picker"
 import { useAsyncStorage } from "./utils/AsyncStorage"
 import FAB from "../components/Fab"
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
+import { RootStackParamList } from "../models/route"
+import useFirebaseService from "./utils/firebase"
 
 
 const Home: React.FC<{
-  navigation: StackNavigationProp<any>;
-}> = (props) => {
+} & BottomTabScreenProps<RootStackParamList,"Home">> = (props) => {
   const toast = useToast()
   const [playlist,asyncStorage] = useAsyncStorage({
     initialState:[],
@@ -68,7 +69,7 @@ const Home: React.FC<{
   }
 
   return (
-    <Box style={{position:"relative",flex:1,backgroundColor:"black"}} >
+    <Box style={{position:"relative",flex:1}} >
       <Box style={styles.root}>
         <Header toggleModal={toggleModal} />
         <Divider />
@@ -80,7 +81,7 @@ const Home: React.FC<{
             />
           )} keyExtractor={item => item.uri}
         />
-        <FAB open={openFAB} toggle={toggleFAB}
+        {/* <FAB open={openFAB} toggle={toggleFAB}
           icons={[
             {
               // icon: <Text>This is a text</Text>,
@@ -99,7 +100,7 @@ const Home: React.FC<{
               onPress: PickSingleDocument
             }
           ]}
-        />
+        /> */}
         <ActionSheet
           onOpen={openActionSheet} title={currentMedia?.name ?? ""}
           onClose={closeActionSheet} open={isOpenActionSheet}
@@ -134,7 +135,6 @@ const Home: React.FC<{
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "#0B0E11",
     justifyContent: 'center',
     alignItems: 'center',
     position: "relative",

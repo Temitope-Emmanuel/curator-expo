@@ -1,8 +1,8 @@
-import { TransitionSpecs } from "@react-navigation/stack";
+// import { TransitionSpecs } from "@react-navigation/stack";
 
-type TransitionSpec = typeof TransitionSpecs.TransitionIOSSpec;
+// type TransitionSpec = typeof TransitionSpecs.TransitionIOSSpec;
 
-export const FastIOSTransitionSpec: TransitionSpec = {
+export const FastIOSTransitionSpec = {
   animation: "spring",
   config: {
     stiffness: 1000,

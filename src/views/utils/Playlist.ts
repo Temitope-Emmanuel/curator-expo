@@ -57,7 +57,6 @@ export class PlaylistClass {
                 initialPlayback,initialStatus
                 ,this.handlePlaybackUpdate
             )
-            console.log("this is the status",{status})
             this.playbackInstance = sound;
             this.handlePlaybackUpdate(status)
         }catch(err) {

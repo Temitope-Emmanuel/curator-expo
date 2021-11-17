@@ -7,7 +7,7 @@ import { Box } from "native-base"
 import { View, StyleSheet, Dimensions} from "react-native"
 import { PanGestureHandler, TapGestureHandler } from "react-native-gesture-handler";
 import MaskedView from "@react-native-community/masked-view"
-import { STICK_FULL_WIDTH, STICK_WIDTH, STICK_MARGIN } from "../views/utils/constants"
+import { FULL_BAR_WIDTH, BAR_WIDTH, BAR_MARGIN } from "../views/utils/constants"
 import * as ReactNativeSvg from "react-native-svg"
 
 const {Rect,Svg} = ReactNativeSvg
@@ -21,7 +21,7 @@ const WaveForm: React.FC<{
     const offset = 0;
     const waveformHeight = 140;
     const height = waveformHeight + waveformMargin + (waveformHeight * 0.61);
-    const width = samples.length * (STICK_WIDTH + STICK_MARGIN) + (offset * 2)
+    const width = samples.length * (BAR_WIDTH + BAR_MARGIN) + (offset * 2)
     
 
     return (
@@ -29,16 +29,16 @@ const WaveForm: React.FC<{
             {
                 samples.map((value,key) => (
                     <Rect {...{key}} fill="white"
-                        height={value} width={STICK_WIDTH}
-                        y={waveformHeight - value} x={key * (STICK_FULL_WIDTH) + offset}
+                        height={value} width={BAR_WIDTH}
+                        y={waveformHeight - value} x={key * (FULL_BAR_WIDTH) + offset}
                     />
                 ))
             }
             {
                 samples.map((value,key) => (
                     <Rect {...{key}} fill="white"
-                        height={value * 0.61} width={STICK_WIDTH}
-                        y={waveformHeight + STICK_MARGIN} x={key * (STICK_FULL_WIDTH) + offset}
+                        height={value * 0.61} width={BAR_WIDTH}
+                        y={waveformHeight + BAR_MARGIN} x={key * (FULL_BAR_WIDTH) + offset}
                     />
                 ))
             }
@@ -140,7 +140,7 @@ const MainWavefrom: React.FC<{
         })
 
         const handleSeek = ({nativeEvent}) => {
-            const newPosition = -(panX.value/STICK_FULL_WIDTH) * 1000;
+            const newPosition = -(panX.value/FULL_BAR_WIDTH) * 1000;
             const seekTo = newPosition + (nativeEvent.translationX as number)
             seek(seekTo)
         }
@@ -216,8 +216,8 @@ const waveFormStyles = StyleSheet.create({
     },
     stick: {
         backgroundColor: 'white',
-        width: STICK_WIDTH,
-        marginRight: STICK_MARGIN,
+        width: BAR_WIDTH,
+        marginRight: BAR_MARGIN,
     },
 });
 

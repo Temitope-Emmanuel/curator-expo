@@ -1,6 +1,6 @@
 import React from "react"
 import { Input, Icon, Box, useDisclose} from "native-base"
-// import MaterialIcon from "@expo/vector-icons/MaterialIcons"
+import {MaterialIcons} from "@expo/vector-icons"
 import { Controller } from "react-hook-form"
 
 const PasswordInput:React.FC<{
@@ -11,14 +11,14 @@ const PasswordInput:React.FC<{
     const {isOpen:open,onToggle} = useDisclose()
   return (
     <Box w="100%">
-      {/* <Controller 
+      <Controller 
         control={control} name="password"
         render={({field:{onBlur,onChange,value}}) => (
           <Input value={value} onChangeText={onChange}
             onBlur={onBlur} type={open ? "text" : "password"}
             InputRightElement={
               <Icon onPress={onToggle}
-                as={<MaterialIcon name={open ? "remove-red-eye" : "visibility-off"} />}
+                as={<MaterialIcons name={open ? "remove-red-eye" : "visibility-off"} />}
                 size="md"
                 m={2}
                 _light={{
@@ -38,7 +38,7 @@ const PasswordInput:React.FC<{
             }}
           />
         )}
-      /> */}
+      />
     </Box>
   )
 }
