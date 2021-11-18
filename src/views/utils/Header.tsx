@@ -1,8 +1,8 @@
 import React from "react"
 import { StyleSheet } from "react-native"
+import useFirebaseService from "./firebase"
 import { AntDesign } from "@expo/vector-icons"
 import { HStack, Heading, IconButton, Avatar } from "native-base"
-import useFirebaseService from "./firebase"
 
 
 

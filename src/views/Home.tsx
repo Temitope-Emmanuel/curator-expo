@@ -1,20 +1,20 @@
-import { Box, useToast, Text, useDisclose, Divider } from "native-base"
 import React from "react"
-import { StyleSheet, FlatList } from "react-native"
-import AuthModal from "../components/AuthModal"
-import { IMedia } from "../models/Media"
 import Header from "./utils/Header"
+import { IMedia } from "../models/Media"
+import AuthModal from "../components/AuthModal"
+import { StyleSheet, FlatList } from "react-native"
+import UploadModal from "../components/UploadModal"
 import SingleMedia from "../components/SingleMedia"
-import { AntDesign } from "@expo/vector-icons"
-import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5"
-import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons"
 import ActionSheet from "../components/ActionSheet"
+import { RootStackParamList } from "../models/route"
 import * as DocumentPicker from "expo-document-picker"
 import { useAsyncStorage } from "./utils/AsyncStorage"
-import FAB from "../components/Fab"
+import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5"
+import { Box, useToast, useDisclose, Divider } from "native-base"
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
-import { RootStackParamList } from "../models/route"
-import useFirebaseService from "./utils/firebase"
+import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons"
+import { AntDesign } from "@expo/vector-icons"
+import FAB from "../components/Fab"
 
 
 const Home: React.FC<{
@@ -25,6 +25,7 @@ const Home: React.FC<{
     key:"@@media",
     toast
   })
+  const {isOpen:showUpload, onToggle:toggleUpload} = useDisclose()
   const { isOpen: openFAB, onToggle: toggleFAB } = useDisclose()
   const { isOpen: openModal, onToggle: toggleModal } = useDisclose()
   const { isOpen: isOpenActionSheet, onOpen: openActionSheet, onClose: closeActionSheet } = useDisclose()
@@ -68,6 +69,11 @@ const Home: React.FC<{
     }
   }
 
+  const handleUploadToggle = () => {
+    toggleUpload()
+    closeActionSheet()
+  }
+
   return (
     <Box style={{position:"relative",flex:1}} >
       <Box style={styles.root}>
@@ -81,7 +87,7 @@ const Home: React.FC<{
             />
           )} keyExtractor={item => item.uri}
         />
-        {/* <FAB open={openFAB} toggle={toggleFAB}
+        <FAB open={openFAB} toggle={toggleFAB}
           icons={[
             {
               // icon: <Text>This is a text</Text>,
@@ -100,7 +106,7 @@ const Home: React.FC<{
               onPress: PickSingleDocument
             }
           ]}
-        /> */}
+        />
         <ActionSheet
           onOpen={openActionSheet} title={currentMedia?.name ?? ""}
           onClose={closeActionSheet} open={isOpenActionSheet}
@@ -110,6 +116,12 @@ const Home: React.FC<{
               icon: "share",
               iconType: MaterialCommunityIcon,
               onPress: () => console.log("Clicked on the share button")
+            },
+            {
+              label: "Upload",
+              icon: "cloud-upload",
+              iconType: MaterialCommunityIcon,
+              onPress: handleUploadToggle
             },
             {
               label: "Delete",
@@ -126,9 +138,18 @@ const Home: React.FC<{
           ]}
         />
       </Box>
-      <AuthModal openModal={openModal}
-        toggleModal={toggleModal}
-      />
+      {
+        openModal &&
+        <AuthModal openModal={openModal}
+          toggleModal={toggleModal}
+        />
+      }
+      {
+        showUpload && 
+        <UploadModal open={showUpload} toast={toast}
+         media={currentMedia} handleToggle={toggleUpload} 
+        />
+      }
     </Box>
   )
 }

@@ -4,9 +4,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import Home from "./Home"
 import MediaDetail from "./MediaDetail";
-import Explore from "./Explore"
+import Notification from "./Notification"
 import { FastIOSTransitionSpec } from "./utils/transitions"
-import {AntDesign,MaterialIcons} from "@expo/vector-icons"
+import {AntDesign,Ionicons,MaterialIcons} from "@expo/vector-icons"
 import { IconButton,Icon, Flex } from "native-base"
 import { RootStackParamList } from "../models/route"
 
@@ -20,13 +20,13 @@ const tabIcons = {
     icon:AntDesign,
     name:"home"
   },
-  "Explore":{
-    icon:MaterialIcons,
-    name:"explore"
-  },
   "MediaDetail":{
     icon:MaterialIcons,
     name:"my-library-music"
+  },
+  "Notification":{
+    icon:Ionicons,
+    name:"md-notifications-sharp"
   }
 }
 
@@ -58,8 +58,8 @@ const Router = () => {
           })}
         >
           <Tab.Screen name="Home" component={Home} />
-          <Tab.Screen name="Explore" component={Explore} />
           <Tab.Screen name="MediaDetail" component={MediaDetail} />
+          <Tab.Screen name="Notification" component={Notification} />
         </Tab.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
