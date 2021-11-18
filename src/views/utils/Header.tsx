@@ -11,15 +11,8 @@ const Header: React.FC<{
 }> = ({
   toggleModal
 }) => {
-  const {currentUser} = useFirebaseService()
-  const { isAuthenticated, profile } = {
-    isAuthenticated: false,
-    profile: {
-      photoURL: "",
-      displayName: ""
-    }
-  }
-
+  const {profile,isAuthenticated} = useFirebaseService()
+  
   return (
     <HStack style={styles.nav}>
       <HStack space={1} style={styles.subNav}>
@@ -32,13 +25,13 @@ const Header: React.FC<{
       </HStack>
       <IconButton
         icon={
-          <Avatar m={1}
-            source={{
-              uri: isAuthenticated && profile.photoURL.length ? profile.photoURL as string : undefined
-            }}
+          <Avatar m={1} bg="gray.800" color="white"
+            // source={{
+              // uri: isAuthenticated && profile.photoURL.length ? profile.photoURL as string : undefined
+            // }}
           >
             {
-              isAuthenticated ? profile.displayName?.split(" ").map(item => item.charAt(0)).join("") : "NE"
+              isAuthenticated ? `${profile.username[0]}${profile.username[1]}`.toUpperCase() : "NE"
             }
           </Avatar>
         }

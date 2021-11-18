@@ -7,9 +7,10 @@ import { IAccount } from "../../models/Account"
 
 
 const [useFirebaseService,FirebaseServiceContextProvider] = createGenericContext<{
-    currentUser:firebase.User | null;
+    profile:IAccount | null;
+    isAuthenticated:boolean;
     loginUser:(arg:{email:string,password:string}) => Promise<firebase.auth.UserCredential>;
-    createNewUserWithEmailAndPassword:(arg:{email:string,password:string}) => Promise<void>
+    createNewUserWithEmailAndPassword:(arg:{email:string,username?:string,password:string}) => Promise<void>
 } & Firebase>()
 
 export const FirebaseServiceProvider = <P extends object>(Component:React.ComponentType<P>) => {
@@ -18,11 +19,28 @@ export const FirebaseServiceProvider = <P extends object>(Component:React.Compon
     return function Provider({...props}){
         const toast = useToast()
         const userCollection = React.useRef(() => firebase.firestore.collection("Users"))
-        const [auth,setAuth] = React.useState<firebase.User | null>(null)
+        const [auth,setAuth] = React.useState<IAccount | null>(null)
         
+        const getUserDetail = (userId:string) => {
+            return userCollection.current().doc(userId).get().then(payload => {
+                if(payload.exists){
+                    const data:IAccount = {
+                        id:userId,
+                        ...payload.data() as any
+                    }
+                    return data
+                }
+            })
+        }
+
         const handleAuthStateChange = (newAuth:firebase.User | null) => {
             if(newAuth){
-                setAuth(newAuth)
+                // setAuth(newAuth)
+                getUserDetail(newAuth.uid).then(data => {
+                    if(Object.keys(data)){
+                        setAuth(data)
+                    }
+                })
             }else{
                 setAuth(null)
             }
@@ -47,8 +65,9 @@ export const FirebaseServiceProvider = <P extends object>(Component:React.Compon
             return firebase.auth.signInWithEmailAndPassword(email, password)
         }
 
-        const createNewUserWithEmailAndPassword = async ({ email, password }: {
+        const createNewUserWithEmailAndPassword = async ({ email, username, password }: {
             email: string;
+            username?:string;
             password: string
         }) => {
             return firebase.auth.createUserWithEmailAndPassword(email, password).then(data => {
@@ -60,7 +79,7 @@ export const FirebaseServiceProvider = <P extends object>(Component:React.Compon
                         verified: data.user.emailVerified,
                         photoURL: data.user.photoURL || "",
                         provider: "email",
-                        username: (data.additionalUserInfo.profile as any)?.name || ""
+                        username: username || (data.additionalUserInfo.profile as any)?.name || ""
                     }
                     return addUserToFirestore(newUser)
                 }
@@ -81,7 +100,8 @@ export const FirebaseServiceProvider = <P extends object>(Component:React.Compon
             <FirebaseServiceContextProvider
                 value={{
                     ...firebase,
-                    currentUser:auth,
+                    profile:auth,
+                    isAuthenticated:auth ? !!Object.keys(auth).length : false,
                     loginUser,
                     createNewUserWithEmailAndPassword
                 }}

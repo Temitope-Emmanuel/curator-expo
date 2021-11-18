@@ -1,16 +1,15 @@
-// import useFirebaseService from "@src/utils/Firebase/Firebase"
 import { Button, Icon, Text, useDisclose, useToast, VStack } from "native-base"
 import Input from "./Input"
 import Modal from "./Modal"
 import React from "react"
 import { useForm } from "react-hook-form"
-import {MaterialIcons} from "@expo/vector-icons"
-import {AntDesign} from "@expo/vector-icons"
+import {AntDesign,MaterialIcons,FontAwesome} from "@expo/vector-icons"
 import PasswordInput from "./Password"
 import useFirebaseService from "../views/utils/firebase"
 
 interface InputProps {
     password: string;
+    username:string;
     email: string
 }
 
@@ -25,19 +24,25 @@ const AuthModal: React.FC<{
         const { control, formState, handleSubmit } = useForm<InputProps>({
             defaultValues: {
                 email: "",
+                username:"",
                 password: ""
             }
         })
         const { isOpen: submitting, onToggle: toggleSubmitting } = useDisclose()
         
-        const onSubmit = async ({ email, password }: InputProps) => {
+        const onSubmit = async ({ email, password, username }: InputProps) => {
             return loginUser({
                 email, password
             }).then((data) => {
                 toggleModal()
             }).catch(err => {
                 if (err.code === "auth/user-not-found") {
-                    createNewUserWithEmailAndPassword({ email, password })
+                    createNewUserWithEmailAndPassword({ email, password, username }).then(() => {
+                        toggleModal
+                    })
+                    .catch(err => {
+                        console.log("there's been an err",JSON.stringify(err))
+                    })
                 } else {
                     toast.show({
                         title: "Unable to create login User",
@@ -71,6 +76,11 @@ const AuthModal: React.FC<{
                             <MaterialIcons name="email" />
                         } />
                     <PasswordInput control={control} />
+                    <Input control={control} name="username"
+                        placeholder="Input Username"
+                        rightIcon={
+                            <FontAwesome name="user" />
+                        } />
                     <Button isLoading={submitting || formState.isSubmitting || !formState.isValid}
                         onPress={handleSubmit(onSubmit)} isLoadingText="Creating User" >
                         Create User
