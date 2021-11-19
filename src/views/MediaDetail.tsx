@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleSheet } from "react-native"
 import { AVPlaybackStatus } from "expo-av"
-import { useToast, View, Text } from "native-base";
+import { useToast, View } from "native-base";
 import { useAsyncStorage } from "./utils/AsyncStorage";
 import { PlaylistClass } from "./utils/Playlist";
 import { IMedia } from "../models/Media";
@@ -15,6 +15,9 @@ import waveform from "../assets/data/waveform.json"
 import TabView from "../../src/components/TabView"
 import WaveFormContainer from "../components/WaveFormContainer";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import useMediaService from "./utils/mediaPlayer";
+
+
 
 const MediaDetail: React.FC<{} & BottomTabScreenProps<RootStackParamList,"MediaDetail">> = ({
     route
@@ -195,7 +198,6 @@ const MediaDetail: React.FC<{} & BottomTabScreenProps<RootStackParamList,"MediaD
         //     }
         // }
 
-       
         return (
             <View style={styles.container}>
                 <WaveFormContainer waveform={waveform.samples} />

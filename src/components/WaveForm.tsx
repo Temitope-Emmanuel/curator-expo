@@ -1,11 +1,10 @@
 import * as React from "react"
 import {Dimensions} from "react-native"
-import Animated from "react-native-reanimated"
 import {Rect,Svg} from "react-native-svg"
 import {BAR_WIDTH,FULL_BAR_WIDTH,BAR_HEIGHT,WAVEFORM_MARGIN} from "../views/utils/constants"
 
-// const offset = wWidth / 2;
-const offset = 1;
+const {width:wWidth} = Dimensions.get("window")
+const offset = wWidth / 2;
 
 
 const Waveform = ({

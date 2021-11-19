@@ -10,6 +10,8 @@ import {AntDesign,Ionicons,MaterialIcons} from "@expo/vector-icons"
 import { IconButton,Icon, Flex } from "native-base"
 import { RootStackParamList } from "../models/route"
 import useNotification from "./utils/notification"
+import useMediaService from "./utils/mediaPlayer"
+import { MediaLayoutProvider } from "./utils/mediaLayout"
 
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
@@ -31,15 +33,23 @@ const tabIcons = {
   }
 }
 
+const HomeWithMedia = MediaLayoutProvider(Home)
+const NotificationWithMedia = MediaLayoutProvider(Notification)
+
 const Router = () => {
+  const mediaService = useMediaService()
   const {unseen:notification} = useNotification()
   
+  React.useEffect(() => {
+    // mediaService.start()
+  },[mediaService])
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <Tab.Navigator initialRouteName="Home"
           screenOptions={({route}) => ({
-            tabBarIcon:(({focused,color,size}) =>{
+            tabBarIcon:(({focused,color,size}) => {
               const icon = tabIcons[route.name]
               return <IconButton
                   // mb={4} variant="solid" rounded="full"
@@ -60,7 +70,7 @@ const Router = () => {
             header:() => <Flex style={{height:"5%"}} />
           })}
         >
-          <Tab.Screen name="Home" component={Home} />
+          <Tab.Screen name="Home" component={HomeWithMedia} />
           <Tab.Screen name="MediaDetail" component={MediaDetail} />
           <Tab.Screen name="Notification" options={{
             tabBarBadge:notification.length ? notification.length : undefined,
@@ -68,7 +78,7 @@ const Router = () => {
               backgroundColor:"black",
               color:"white"
             }
-          }} component={Notification} />
+          }} component={NotificationWithMedia} />
         </Tab.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

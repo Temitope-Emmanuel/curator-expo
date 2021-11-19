@@ -17,11 +17,13 @@ export class PlaylistClass {
     }:{
         toast:IToastProps;
         handleStatusUpdate:ISetStatus<AVPlaybackStatus>;
-        currentMedia:IMedia<"audio">
+        currentMedia?:IMedia<"audio">
     }){
         this.toast = toast;
         this.handleUpdate = handleStatusUpdate;
-        this.currentMedia = currentMedia;
+        if(currentMedia.id){
+            this.currentMedia = currentMedia;
+        }
         this.init()
     }
     init() {

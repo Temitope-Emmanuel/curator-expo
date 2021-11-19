@@ -3,7 +3,6 @@ import { createGenericContext } from "./hooks"
 import { INotification } from "../../models/notification"
 import useFirebaseService from "./firebase"
 
-
 const [useNotification, NotificationContextProvider] = createGenericContext<{
     unseen: INotification[],
     handleNotificationVisibiltyChange: () => void;
@@ -22,7 +21,6 @@ export const NotificationProvider = <P extends object>(Component: React.Componen
 
             const notificationListener = firestore.collection("notifications")
             .doc(profile.id).collection("notify").onSnapshot(data => {
-                console.log("we've been called")
                 const newNotification = data.docs.map(item => ({
                     id: item.id,
                     ...item.data()
