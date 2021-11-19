@@ -9,6 +9,7 @@ import { FastIOSTransitionSpec } from "./utils/transitions"
 import {AntDesign,Ionicons,MaterialIcons} from "@expo/vector-icons"
 import { IconButton,Icon, Flex } from "native-base"
 import { RootStackParamList } from "../models/route"
+import useNotification from "./utils/notification"
 
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
@@ -31,6 +32,8 @@ const tabIcons = {
 }
 
 const Router = () => {
+  const {unseen:notification} = useNotification()
+  
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -59,7 +62,13 @@ const Router = () => {
         >
           <Tab.Screen name="Home" component={Home} />
           <Tab.Screen name="MediaDetail" component={MediaDetail} />
-          <Tab.Screen name="Notification" component={Notification} />
+          <Tab.Screen name="Notification" options={{
+            tabBarBadge:notification.length ? notification.length : undefined,
+            tabBarBadgeStyle:{
+              backgroundColor:"black",
+              color:"white"
+            }
+          }} component={Notification} />
         </Tab.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

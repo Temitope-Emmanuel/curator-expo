@@ -11,34 +11,34 @@ const Header: React.FC<{
 }> = ({
   toggleModal
 }) => {
-  const {profile,isAuthenticated} = useFirebaseService()
-  
-  return (
-    <HStack style={styles.nav}>
-      <HStack space={1} style={styles.subNav}>
-        {/* <AntDesign size={15} style={{ color: "#FD4D4D" }} name="book" /> */}
-        <Heading
-          // color="#FD4D4D"
-        >
-          Curator
-        </Heading>
-      </HStack>
-      <IconButton
-        icon={
-          <Avatar m={1} bg="gray.800" color="white"
-            // source={{
-              // uri: isAuthenticated && profile.photoURL.length ? profile.photoURL as string : undefined
-            // }}
-          >
-            {
-              isAuthenticated ? `${profile.username[0]}${profile.username[1]}`.toUpperCase() : "NE"
-            }
-          </Avatar>
-        }
-        onPress={toggleModal} />
-    </HStack>
+    const { profile, isAuthenticated } = useFirebaseService()
 
-  )
+    return (
+      <HStack style={styles.nav}>
+        <HStack space={1} style={styles.subNav}>
+          {/* <AntDesign size={15} style={{ color: "#FD4D4D" }} name="book" /> */}
+          <Heading
+          // color="#FD4D4D"
+          >
+            Curator
+          </Heading>
+        </HStack>
+        <IconButton
+          icon={
+            <Avatar m={1} bg="gray.800" color="white"
+            // source={{
+            // uri: isAuthenticated && profile.photoURL.length ? profile.photoURL as string : undefined
+            // }}
+            >
+              {
+                isAuthenticated ? `${profile.username[0]}${profile.username[1]}`.toUpperCase() : "NE"
+              }
+            </Avatar>
+          }
+          onPress={toggleModal} />
+      </HStack>
+
+    )
   }
 
 const styles = StyleSheet.create({

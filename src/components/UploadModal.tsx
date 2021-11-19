@@ -19,7 +19,6 @@ const UploadModal:React.FC<{
     const [progress,setProgress] = React.useState(0)
     const {isOpen:isUploading,onOpen:startUploading,onClose:stopUploading} = useDisclose()
     
-    // console.log("this is the storage",storage.ref().)
     const uploadMedia = async (fileUri:string) => {
         setProgress(0)
         startUploading()
@@ -30,12 +29,12 @@ const UploadModal:React.FC<{
             }
             xhr.onerror = function(err) {
                 console.log("this is the error",JSON.stringify(err))
+                handleToggle()
                 toast.show({
                     status: "error",
                     title: "Something went wrong when uploading file",
                     // description: err.message ?? ""
                 })
-                reject(new TypeError("Network request failed"))
             }
             xhr.responseType = "blob";
             xhr.open("GET",fileUri,true);

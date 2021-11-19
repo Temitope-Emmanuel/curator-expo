@@ -2,6 +2,7 @@ import { NativeBaseProvider } from "native-base"
 import React from "react"
 import Views from "./src/views"
 import { FirebaseServiceProvider } from "./src/views/utils/firebase"
+import { NotificationProvider } from "./src/views/utils/notification"
 
 const App = () => {
   return(
@@ -11,4 +12,4 @@ const App = () => {
   )
 }
 
-export default FirebaseServiceProvider(App)
+export default FirebaseServiceProvider(NotificationProvider(App))

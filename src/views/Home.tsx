@@ -54,7 +54,6 @@ const Home: React.FC<{
         type: "audio/*",
         copyToCacheDirectory:false
       })
-      console.log("this is the response",{res})
       if (res.type === "success") {
         const { type, ...newAudio } = res
         await asyncStorage.addData({ ...newAudio, id: newAudio.uri })
@@ -87,7 +86,7 @@ const Home: React.FC<{
             />
           )} keyExtractor={item => item.uri}
         />
-        <FAB open={openFAB} toggle={toggleFAB}
+        {/* <FAB open={openFAB} toggle={toggleFAB}
           icons={[
             {
               // icon: <Text>This is a text</Text>,
@@ -106,7 +105,7 @@ const Home: React.FC<{
               onPress: PickSingleDocument
             }
           ]}
-        />
+        /> */}
         <ActionSheet
           onOpen={openActionSheet} title={currentMedia?.name ?? ""}
           onClose={closeActionSheet} open={isOpenActionSheet}
