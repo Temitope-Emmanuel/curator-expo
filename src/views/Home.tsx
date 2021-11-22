@@ -10,9 +10,10 @@ import { RootStackParamList } from "../models/route"
 import * as DocumentPicker from "expo-document-picker"
 import { useAsyncStorage } from "./utils/AsyncStorage"
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5"
-import { Box, useToast, useDisclose, Divider } from "native-base"
+import { Box, useToast, useDisclose, Divider, Flex } from "native-base"
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons"
+import SwipeList from "../components/SwipeList"
 import { AntDesign } from "@expo/vector-icons"
 import FAB from "../components/Fab"
 
@@ -32,7 +33,7 @@ const Home: React.FC<{
   const [currentMedia, setCurrentMedia] = React.useState<IMedia<"audio">>()
 
   const handleCurrentMedia = React.useMemo(() =>
-    (uri: number | string) => () => {
+    (uri:string) => {
       const foundMedia = playlist.find(item => item.uri === uri)
       if (foundMedia) {
         setCurrentMedia(foundMedia as any)
@@ -40,7 +41,7 @@ const Home: React.FC<{
       }
     }, [playlist])
 
-  const handleNavigation = (arg: string | number) => () => {
+  const handleNavigation = (arg: string) => {
     props.navigation.navigate("MediaDetail", { uri: arg })
   }
   const handleDelete = (id: string) => {
@@ -78,14 +79,12 @@ const Home: React.FC<{
       <Box style={styles.root}>
         <Header toggleModal={toggleModal} />
         <Divider />
-        <FlatList data={playlist}
-          style={styles.listContainer}
-          renderItem={({ item }) => (
-            <SingleMedia {...(item as IMedia<"audio">)} onClick={handleNavigation(item.uri)}
-              key={item.uri} setMedia={handleCurrentMedia(item.uri)}
-            />
-          )} keyExtractor={item => item.uri}
-        />
+        <Flex flex={1} width="100%">
+          <SwipeList handleDelete={handleDelete}
+           handlePress={handleNavigation} showMore={handleCurrentMedia}
+           data={playlist as IMedia<"audio">[]}
+          />
+        </Flex>
         {/* <FAB open={openFAB} toggle={toggleFAB}
           icons={[
             {

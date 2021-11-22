@@ -1,5 +1,5 @@
 import React from "react"
-import {Flex,Text,Image, VStack, Icon,HStack, useDisclose, IconButton} from "native-base"
+import {Flex,Text,Image, VStack,HStack, useDisclose, IconButton} from "native-base"
 import useMediaService from "./mediaPlayer"
 import {FontAwesome5,MaterialCommunityIcons} from "@expo/vector-icons"
 import ToggleComponent from "../../components/ToggleComponent"
@@ -7,7 +7,6 @@ import ToggleComponent from "../../components/ToggleComponent"
 
 export const MediaLayoutProvider = <P extends object>(Component: React.ComponentType<P>) => {
     return function Provider({ ...props }) {
-        const [isOpen, setIsOpen] = React.useState(false)
         const {currentMedia} = useMediaService()
         const {isOpen:open,onToggle:toggle} = useDisclose(true)
         

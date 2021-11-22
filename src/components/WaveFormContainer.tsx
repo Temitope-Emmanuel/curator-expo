@@ -6,7 +6,6 @@ import Animated, {
   useSharedValue, useAnimatedGestureHandler,
   withTiming, useAnimatedStyle, interpolate
 } from "react-native-reanimated";
-import WaveFormSample from "../assets/data/waveform.json";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { BAR_HEIGHT, FULL_BAR_WIDTH, WAVEFORM_MARGIN } from "../views/utils/constants"
 
@@ -19,29 +18,17 @@ function findNearestMultiple(n, multiple) {
 }
 
 const WaveFormContainer: React.FC<{
-  waveform: number[]
+  waveform: number[];
+  playing:boolean;
+  sliding:Animated.SharedValue<boolean>;
+  panX:Animated.SharedValue<number>;
 }> = ({
-  waveform
+  waveform,sliding,panX
 }) => {
-    const panX = useSharedValue(0)
-    const sliding = useSharedValue(false)
-    const playing = useSharedValue(false)
+  
     const maxPanX = -wWidth
     const height = BAR_HEIGHT + 0.61 * BAR_HEIGHT + WAVEFORM_MARGIN;
     const width = waveform.length * FULL_BAR_WIDTH + (offset * 2);
-
-    const updateProgress = () => {
-      'worklet';
-
-      if (true) {
-        panX.value = withTiming(panX.value - FULL_BAR_WIDTH);
-      }
-    };
-
-    React.useEffect(() => {
-      const interval = setInterval(() => updateProgress(), 150);
-      return () => clearInterval(interval);
-    }, []);
 
     const panGestureHandler = useAnimatedGestureHandler({
       onStart(_, context: {
@@ -113,10 +100,9 @@ const WaveFormContainer: React.FC<{
                   playedAnimatedStyle
                 ]}
               >
-                <Waveform {...{ width, height }}
+                <Waveform {...{ width, height, waveform }}
                   primaryColor="#e95f2a"
                   secondaryColor="#f5c19f"
-                  waveform={WaveFormSample.samples.slice(0,300)}
                 />
               </Animated.View>
             }

@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IMedia,IMediaPlaylist } from "../../models/Media";
 import { IToastProps } from "../../models/Toast";
 
-type StorageType = IMedia<"audio"> | IMediaPlaylist
+export type StorageType = IMedia<"audio"> | IMediaPlaylist
 type AcceptedKey = "@@media" | "@@playlist"
 type ISetStatus<K> = React.Dispatch<React.SetStateAction<K>>;
 
@@ -58,7 +58,6 @@ class AsyncStorageClass {
 
   addData = async (value: StorageType) => {
     try{
-      console.log("this is the data",{value})
       const newData = [...this.storage,value];
       await this.storeData(newData);
     }catch(err){

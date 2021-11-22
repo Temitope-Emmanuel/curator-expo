@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Animated, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import Constants from 'expo-constants';
-import { Foundation,MaterialIcons } from "@expo/vector-icons"
+import { Foundation,FontAwesome,MaterialIcons } from "@expo/vector-icons"
 import { Icon, IconButton } from 'native-base';
 
 const FirstRoute = () => (
@@ -11,12 +11,17 @@ const FirstRoute = () => (
 const SecondRoute = () => (
     <View style={[styles.container, { backgroundColor: 'grey' }]} />
 );
+const ThirdRoute = () => (
+    <View style={[styles.container,{backgroundColor:"blue"}]} />
+)
 
-const getIcon = (arg:"0" | "1") => {
+const getIcon = (arg:"0" | "1" | "2") => {
     if(arg === "0"){
         return(<Icon as={MaterialIcons} name="notes" />)
-    }else{
+    }else if(arg === "1"){
         return(<Icon as={Foundation} name="clipboard-notes" />)
+    }else{
+        return(<Icon as={FontAwesome} name="users" />)
     }
 }
 
@@ -25,40 +30,35 @@ const TabViewContainer = () => {
     const [routes] = React.useState([
         { key: 'first', title: 'Notes' },
         { key: 'second', title: 'Timestamp' },
+        {key:"third",title:"Users"}
     ])
 
     const handleIndexChange = (index:number) => setIndex(index);
 
     const renderTabBar = (props) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-
         return (
             <View style={styles.tabBar}>
                 {props.navigationState.routes.map((route, i) => {
-                    const opacity = props.position.interpolate({
-                        inputRange,
-                        outputRange: inputRange.map((inputIndex) =>
-                            inputIndex === i ? 1 : 0.5
-                        ),
-                    });
+                    const icon = getIcon(`${i}` as any)
+                    const handleIndexChange = () => setIndex(i)
+
                     return (
                         <TouchableOpacity key={i}
                             style={styles.tabItem}
-                            onPress={() => setIndex(i)}>
+                            onPress={handleIndexChange}>
                             <IconButton
-                                icon={getIcon(`${i}` as any)}
+                                icon={icon}
                                 borderRadius="full"
                                 _icon={{
                                     // color: "orange.500",
                                     size: "sm",
-                                    // opacity
+                                    opacity:idx === i ? 100 : 50
                                 }}
                                 _hover={{
                                     opacity:50,
                                     // bg: "orange.600:alpha.20",
                                 }}
                             />
-                            {/* <Animated.Text style={{ opacity }}>{route.title}</Animated.Text> */}
                         </TouchableOpacity>
                     );
                 })}
@@ -69,6 +69,7 @@ const TabViewContainer = () => {
     const renderScene = SceneMap({
         first: FirstRoute,
         second: SecondRoute,
+        third:ThirdRoute
     });
 
     return (

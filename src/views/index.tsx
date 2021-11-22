@@ -41,7 +41,7 @@ const Router = () => {
   const {unseen:notification} = useNotification()
   
   React.useEffect(() => {
-    // mediaService.start()
+    mediaService.start()
   },[mediaService])
 
   return (

@@ -21,7 +21,7 @@ export class PlaylistClass {
     }){
         this.toast = toast;
         this.handleUpdate = handleStatusUpdate;
-        if(currentMedia.id){
+        if(currentMedia?.id){
             this.currentMedia = currentMedia;
         }
         this.init()
@@ -45,15 +45,16 @@ export class PlaylistClass {
             }
             const initialPlayback:AVPlaybackSource = {
                 uri:media.uri,
-                localUri:media.uri
+                localUri:media.uri,
             }
             const initialStatus:AVPlaybackStatusToSet = {
                 shouldPlay:true,
                 rate:1.0,
-                shouldCorrectPitch:true,
                 volume:1.0,
                 isMuted:false,
-                isLooping:false
+                isLooping:false,
+                progressUpdateIntervalMillis:1500,
+                shouldCorrectPitch:true
             }
             const {sound,status} = await Audio.Sound.createAsync(
                 initialPlayback,initialStatus
@@ -99,11 +100,7 @@ export class PlaylistClass {
     async stop() {
         if(this.playbackInstance){
             await this.playbackInstance.unloadAsync()
-            // this.toast.show({
-            //     title:"Successfully stopped audio",
-            //     status:"success"
-            // })
-            // this.playbackInstance = null
+            this.playbackInstance = null
         }
     }
     

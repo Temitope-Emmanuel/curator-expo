@@ -20,7 +20,8 @@ const SingleMedia:React.FC<IMedia<"audio"> & {
                 onPress={onClick}
             >
                 <HStack space={2}>
-                    <Image alt="this is an image" source={require("../assets/Images/cover.jpg")} style={{width:100, height:100}} />
+                    <Image alt="this is an image" source={require("../assets/Images/cover.jpg")}
+                     style={{width:100, height:100}} />
                     <Box style={{justifyContent:"center"}}>
                         <Text>
                             {name}

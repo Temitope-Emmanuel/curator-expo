@@ -2,18 +2,22 @@ import React from "react"
 import { createGenericContext } from "./hooks"
 import { defaultMedia, IMedia } from "../../models/Media"
 import { useToast } from "native-base"
-import { useAsyncStorage } from "./AsyncStorage"
+import { StorageType, useAsyncStorage } from "./AsyncStorage"
 import { PlaylistClass } from "./Playlist"
 import waveform from "../../assets/data/waveform.json"
 import { IPlaylistState } from "../../models/PlaylistState"
 
 const [useMediaService, MediaServiceContextProvider] = createGenericContext<{
+    getAudio: (mediaId:string) => Promise<StorageType>;
     seekTo: (positionNumber: number) => Promise<void>
     changeTrack:(media:IMedia<"audio">) => void;
-    getAudio: (mediaId:string) => Promise<void>;
     currentMedia:IMedia<"audio">;
     togglePlaying:() => void;
+    state:IPlaylistState;
+    mediaArr:number[];
     start:() => void;
+    seeking:boolean;
+    playing:boolean;
 }>()
 
 export const MediaServiceProvider = <P extends object>(Component: React.ComponentType<P>) => {
@@ -44,9 +48,7 @@ export const MediaServiceProvider = <P extends object>(Component: React.Componen
 
         const getAudio = async (mediaId:string) => {
             const response = await mediaListAsyncStorage.getData(mediaId)
-            if(response){
-                setCurrentMedia(response as IMedia<"audio">)
-            }
+            return response
         }
 
         const start = () => {
@@ -71,16 +73,31 @@ export const MediaServiceProvider = <P extends object>(Component: React.Componen
                 }
             }
         }
+        
         const togglePlaying = React.useCallback(() => {
             toggleMediaState(!playing)
         },[playing])
+
         const seekTo = async (positionNumber:number) => {
             const response = await playlist.current.playbackInstance.setStatusAsync({
                 positionMillis:positionNumber
             })
             console.log('this is the response',JSON.stringify(response))
         }
-        const savedPlaylistDetail = () => {}
+
+        const savedPlaylistDetail = () => {
+            return playlistAsyncStorage.addData({
+                id: currentMedia.name,
+                uri: currentMedia.uri,
+                position: (state as any)?.positionMillis,
+                totalTimesPlayed: 1,
+                description: "",
+                name: currentMedia.name,
+                size: 0,
+                timeline: []
+            })
+        }
+
         React.useEffect(() => {
             if(state){
                 if(mediaArr.length <= 0 && state.durationMillis){
@@ -101,10 +118,11 @@ export const MediaServiceProvider = <P extends object>(Component: React.Componen
         },[state])
 
         React.useEffect(() => {
-            if(currentMedia.id){
+            if(currentMedia?.id){
                 changeTrack(currentMedia)
             }
         },[currentMedia])
+        
 
         return (
             <MediaServiceContextProvider
@@ -113,7 +131,11 @@ export const MediaServiceProvider = <P extends object>(Component: React.Componen
                     changeTrack,
                     togglePlaying,
                     getAudio,
+                    mediaArr,
+                    playing,
+                    seeking,
                     seekTo,
+                    state,
                     start
                 }}
             >
