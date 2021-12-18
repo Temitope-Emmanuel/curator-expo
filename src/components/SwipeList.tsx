@@ -34,14 +34,13 @@ const SwipeList:React.FC<{
   };
 
   const deleteRow = (rowMap, rowKey) => () => {
-    closeRow(rowMap, rowKey);
+    // closeRow(rowMap, rowKey);
     handleDelete(rowKey)
   };
 
   const onRowDidOpen = (rowKey) => {
     console.log('This row opened', rowKey);
   };
-
 
   const renderItem = ({ item, index }) => (
     <TouchableScale key={index}

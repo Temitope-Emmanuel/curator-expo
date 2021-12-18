@@ -2,15 +2,16 @@ import React from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IMedia,IMediaPlaylist } from "../../models/Media";
 import { IToastProps } from "../../models/Toast";
+import { IAudioNote,IPlaylistNotes } from "../../models/AudioNote";
 
-export type StorageType = IMedia<"audio"> | IMediaPlaylist
-type AcceptedKey = "@@media" | "@@playlist"
+export type StorageType = IMedia<"audio"> | IMediaPlaylist | IPlaylistNotes
+type AcceptedKey = "@@media" | "@@playlist" | "@@playlistnote"
 type ISetStatus<K> = React.Dispatch<React.SetStateAction<K>>;
 
-class AsyncStorageClass {
+class AsyncStorageClass<K extends {id:string}> {
   key: string;
-  storage:StorageType[];
-  setStorage:ISetStatus<StorageType[]>;
+  storage:K[];
+  setStorage:ISetStatus<K[]>;
   toast: IToastProps;
   constructor({
     key,
@@ -19,8 +20,8 @@ class AsyncStorageClass {
     setStorage
   }: {
     key: AcceptedKey;
-    storage:StorageType[]
-    setStorage:ISetStatus<StorageType[]>;
+    storage:K[]
+    setStorage:ISetStatus<K[]>;
     toast: IToastProps;
   }) {
     this.key = key;
@@ -28,7 +29,6 @@ class AsyncStorageClass {
     this.setStorage = setStorage
     this.toast = toast;
     this.init();
-    // AsyncStorage.clear()
   }
 
   init = () => {
@@ -56,10 +56,17 @@ class AsyncStorageClass {
     }
   };
 
-  addData = async (value: StorageType) => {
+  addData = async (value: K) => {
     try{
-      const newData = [...this.storage,value];
-      await this.storeData(newData);
+      const filteredData = [...this.storage]
+      const foundFormerIdx = filteredData.findIndex(item => item.id === value.id)
+      if(foundFormerIdx >= 0){
+        filteredData.splice(foundFormerIdx,1,value)
+        await this.storeData(filteredData);
+      }else{
+        const newData = [...this.storage,value];
+        await this.storeData(newData);
+      }
     }catch(err){
       this.toast.show({
         title: `Error: unable to add data`,
@@ -76,13 +83,13 @@ class AsyncStorageClass {
     return newData;
   };
 
-  updateStorage = (value:StorageType[]) => {
+  updateStorage = (value:K[]) => {
     this.setStorage(value)
     this.storage = value
   }
 
   // For setting the asyncStorage
-  private storeData = async (value: StorageType[]) => {
+  private storeData = async (value: K[]) => {
     try {
       await AsyncStorage.setItem(this.key, JSON.stringify(value));
       this.updateStorage(value)
@@ -113,16 +120,16 @@ class AsyncStorageClass {
 }
 
 
-export const useAsyncStorage = ({
+export const useAsyncStorage = <K extends {id:string}>({
   initialState,
   toast,key
 }:{
   toast:IToastProps;
   key:AcceptedKey
-  initialState:StorageType[]
-}):[StorageType[],AsyncStorageClass] => {
-  const [storage,setStorage] = React.useState(initialState)
-  const asyncStorage = React.useRef<AsyncStorageClass>()
+  initialState:K[]
+}):[K[],AsyncStorageClass<K>] => {
+  const [storage,setStorage] = React.useState<K[]>(initialState)
+  const asyncStorage = React.useRef<AsyncStorageClass<K>>()
 
   React.useEffect(() => {
     asyncStorage.current = new AsyncStorageClass({

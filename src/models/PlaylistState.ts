@@ -12,6 +12,7 @@ export interface IPlaylistState {
     isPlaying: boolean;
     isBuffering: boolean;
     rate: number;
+    currentTimeFormat:string;
     shouldCorrectPitch: boolean;
     volume: number;
     isMuted: boolean;

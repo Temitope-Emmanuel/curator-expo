@@ -37,12 +37,16 @@ const HomeWithMedia = MediaLayoutProvider(Home)
 const NotificationWithMedia = MediaLayoutProvider(Notification)
 
 const Router = () => {
-  const mediaService = useMediaService()
+  const {start} = useMediaService()
+  const [loaded,setLoaded] = React.useState(false)
   const {unseen:notification} = useNotification()
   
   React.useEffect(() => {
-    mediaService.start()
-  },[mediaService])
+    if(!loaded){
+      start()
+      setLoaded(true)
+    }
+  },[])
 
   return (
     <SafeAreaProvider>

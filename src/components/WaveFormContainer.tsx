@@ -3,7 +3,7 @@ import { View, Dimensions } from "react-native";
 import MaskedView from "@react-native-community/masked-view";
 import Waveform from "./Waveform";
 import Animated, {
-  useSharedValue, useAnimatedGestureHandler,
+  useAnimatedGestureHandler,
   withTiming, useAnimatedStyle, interpolate
 } from "react-native-reanimated";
 import { PanGestureHandler } from "react-native-gesture-handler";

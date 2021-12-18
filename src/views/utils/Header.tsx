@@ -2,7 +2,7 @@ import React from "react"
 import { StyleSheet } from "react-native"
 import useFirebaseService from "./firebase"
 import { AntDesign } from "@expo/vector-icons"
-import { HStack, Heading, IconButton, Avatar } from "native-base"
+import { HStack, Heading, IconButton, Avatar,Button } from "native-base"
 
 
 
@@ -23,19 +23,26 @@ const Header: React.FC<{
             Curator
           </Heading>
         </HStack>
-        <IconButton
-          icon={
-            <Avatar m={1} bg="gray.800" color="white"
-            // source={{
-            // uri: isAuthenticated && profile.photoURL.length ? profile.photoURL as string : undefined
-            // }}
-            >
-              {
-                isAuthenticated ? `${profile.username[0]}${profile.username[1]}`.toUpperCase() : "NE"
-              }
-            </Avatar>
-          }
-          onPress={toggleModal} />
+        {
+          isAuthenticated ? 
+          <IconButton
+            icon={
+              <Avatar m={1} bg="gray.800" color="white"
+              // source={{
+              // uri: isAuthenticated && profile.photoURL.length ? profile.photoURL as string : undefined
+              // }}
+              >
+                {
+                  isAuthenticated ? `${profile.username[0]}${profile.username[1]}`.toUpperCase() : "NE"
+                }
+              </Avatar>
+            }
+            onPress={toggleModal} /> 
+            : 
+            <Button variant="outline" m={1} onPress={toggleModal} >
+              Sign In
+            </Button>
+        }
       </HStack>
 
     )

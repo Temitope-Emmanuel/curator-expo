@@ -35,18 +35,20 @@ const InputComponent:React.FC<{
               /> : undefined
             }
             InputRightElement={
-                rightIcon ? 
-              <Icon
-                as={rightIcon}
-                size="md"
-                m={2}
-                _light={{
-                  color: "black",
-                }}
-                _dark={{
-                  color: "gray.300",
-                }}
-              /> : undefined
+                rightIcon ?
+                rightIcon 
+              // <Icon
+              //   as={rightIcon}
+              //   // size="md"
+              //   m={2}
+              //   _light={{
+              //     color: "black",
+              //   }}
+              //   _dark={{
+              //     color: "gray.300",
+              //   }}
+              // />
+               : undefined
             }
             placeholder={placeholder} // mx={4}
             _light={{

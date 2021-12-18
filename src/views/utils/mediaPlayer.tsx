@@ -1,6 +1,6 @@
 import React from "react"
 import { createGenericContext } from "./hooks"
-import { defaultMedia, IMedia } from "../../models/Media"
+import { defaultMedia, IMedia, IMediaPlaylist } from "../../models/Media"
 import { useToast } from "native-base"
 import { StorageType, useAsyncStorage } from "./AsyncStorage"
 import { PlaylistClass } from "./Playlist"
@@ -29,12 +29,12 @@ export const MediaServiceProvider = <P extends object>(Component: React.Componen
         const playlist = React.useRef<PlaylistClass>()
         const [mediaArr,setMediaArr] = React.useState<number[]>([])
         const [currentMedia,setCurrentMedia] = React.useState<IMedia<"audio">>(defaultMedia)
-        const [mediaList, mediaListAsyncStorage] = useAsyncStorage({
+        const [mediaList, mediaListAsyncStorage] = useAsyncStorage<IMedia<"audio">>({
             initialState: [],
             key: "@@media",
             toast
         })
-        const [playlistDetail, playlistAsyncStorage] = useAsyncStorage({
+        const [playlistDetail, playlistAsyncStorage] = useAsyncStorage<IMediaPlaylist>({
             initialState: [],
             key: "@@playlist",
             toast
@@ -91,9 +91,9 @@ export const MediaServiceProvider = <P extends object>(Component: React.Componen
                 uri: currentMedia.uri,
                 position: (state as any)?.positionMillis,
                 totalTimesPlayed: 1,
-                description: "",
+                // description: "",
                 name: currentMedia.name,
-                size: 0,
+                // size: 0,
                 timeline: []
             })
         }

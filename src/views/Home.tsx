@@ -2,9 +2,8 @@ import React from "react"
 import Header from "./utils/Header"
 import { IMedia } from "../models/Media"
 import AuthModal from "../components/AuthModal"
-import { StyleSheet, FlatList } from "react-native"
+import { StyleSheet } from "react-native"
 import UploadModal from "../components/UploadModal"
-import SingleMedia from "../components/SingleMedia"
 import ActionSheet from "../components/ActionSheet"
 import { RootStackParamList } from "../models/route"
 import * as DocumentPicker from "expo-document-picker"
@@ -21,7 +20,7 @@ import FAB from "../components/Fab"
 const Home: React.FC<{
 } & BottomTabScreenProps<RootStackParamList,"Home">> = (props) => {
   const toast = useToast()
-  const [playlist,asyncStorage] = useAsyncStorage({
+  const [playlist,asyncStorage] = useAsyncStorage<IMedia<"audio">>({
     initialState:[],
     key:"@@media",
     toast
