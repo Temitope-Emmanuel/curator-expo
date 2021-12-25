@@ -7,7 +7,7 @@ import Animated, {
   withTiming, useAnimatedStyle, interpolate
 } from "react-native-reanimated";
 import { PanGestureHandler } from "react-native-gesture-handler";
-import { BAR_HEIGHT, FULL_BAR_WIDTH, WAVEFORM_MARGIN } from "../views/utils/constants"
+import { BAR_HEIGHT, FULL_BAR_WIDTH, WAVEFORM_MARGIN } from "../utils/constants"
 
 const { width: wWidth } = Dimensions.get("window")
 const offset = wWidth / 2;

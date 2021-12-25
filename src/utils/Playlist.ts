@@ -1,5 +1,5 @@
-import { defaultMedia, IMedia } from "../../models/Media";
-import { IToastProps } from "../../models/Toast";
+import { defaultMedia, IMedia } from "../models/Media";
+import { IToastProps } from "../models/Toast";
 import { Audio,AVPlaybackStatus, AVPlaybackStatusToSet } from "expo-av"
 import { AVPlaybackSource } from "expo-av/build/AV";
 

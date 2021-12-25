@@ -5,7 +5,7 @@ import React from "react"
 import { useForm } from "react-hook-form"
 import {AntDesign,MaterialIcons,FontAwesome} from "@expo/vector-icons"
 import PasswordInput from "./Password"
-import useFirebaseService from "../views/utils/firebase"
+import useFirebaseService from "../utils/firebase"
 
 interface InputProps {
     password: string;

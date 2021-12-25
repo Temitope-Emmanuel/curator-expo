@@ -3,23 +3,136 @@ import { View, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import Constants from 'expo-constants';
 import { Foundation, FontAwesome, MaterialIcons } from "@expo/vector-icons"
-import { Flex, Icon, IconButton, useToast, Pressable, Text, HStack, Badge } from 'native-base';
+import { Flex, Icon, IconButton,
+    Button, useToast, Pressable, 
+    Text, HStack, Badge, useDisclose, 
+    TextArea
+    } from 'native-base';
 import Input from './Input';
 import { useForm } from 'react-hook-form';
 import { AntDesign } from "@expo/vector-icons"
-import { useAsyncStorage } from '../views/utils/AsyncStorage';
+import { useAsyncStorage } from '../utils/AsyncStorage';
 import { useRoute } from '@react-navigation/native';
 import { IAudioNote, IPlaylistNotes } from '../models/AudioNote';
 import { RootStackParamList } from "../models/route"
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import useMediaService from '../views/utils/mediaPlayer';
+import useMediaService from '../utils/mediaPlayer';
 import { nanoid } from "nanoid/non-secure"
-import { TimeFormatter } from '../views/utils/Playlist';
-import { useTime } from '../views/utils/hooks/useTime';
+import { TimeFormatter } from '../utils/Playlist';
+import { useTime } from '../utils/hooks/useTime';
+import MiniPlayer from './MiniPlayer';
+import Modal from './Modal';
 
-const FirstRoute = () => (
-    <View style={[styles.container, { backgroundColor: 'whitesmoke' }]} />
-);
+const musicData = [
+    {
+        name:"Cry your heart out",
+        artist:"Adele"
+    },
+    {
+        name:"Mimo",
+        artist:"Sola allyson"
+    },
+    {
+        name:"Temisan",
+        artist:"Sola Allyson"
+    },
+    {
+        name:"Oro Oluwa",
+        artist:"Sola Allyson"
+    },
+    {
+        name:"Eji Owuro",
+        artist:"Sola Allyson"
+    },
+]
+
+const initialState = (arg:typeof musicData) => {
+    return arg.map(item => ({
+       ...item,
+        playing:false
+    }))
+}
+
+function reducer(state:ReturnType<typeof initialState>,action:{
+    type:"toggleMediaState";
+    playing:boolean;
+    name:string;
+}) {
+    console.log("this is the action",action)
+    switch(action.type){
+        case 'toggleMediaState':
+            const filteredState = [...state]
+            const foundIdx = filteredState.findIndex(item => item.name === action.name)
+            filteredState.splice(foundIdx,1,{
+                ...filteredState[foundIdx],
+                playing:action.playing
+            })
+            return filteredState
+        default:
+            throw new Error("Invalid action type argument")
+    }
+}
+
+interface ITimestamp {
+    title:string;
+    description:string
+}
+
+const AddNewTimestamp = () => {
+    const { control, formState, handleSubmit } = useForm<ITimestamp>({
+        defaultValues: {
+            title:"",
+            description:""
+        }
+    })
+    return(
+        <>
+            <Input control={control} name="title"
+                placeholder="Input Timestamp title"
+            />
+            <TextArea h={20} mt={2}
+            placeholder="Add New Description"/>
+        </>
+    )
+}
+
+const MiniPlaylistRoute = () => {
+    const [state,dispatch] = React.useReducer(reducer,musicData,initialState)
+    const {isOpen:open,onToggle:toggle} = useDisclose()
+    
+    return(
+        <>
+            <View style={[styles.container, { backgroundColor: 'whitesmoke', position:'relative' }]}>
+                <ScrollView>
+                    {
+                        state.map(({name,playing,artist},key) => (
+                            <Flex height="15%" {...{key}}>
+                                <MiniPlayer {...{artist,name,playing,key}}
+                                    togglePlaying={React.useCallback(() => dispatch({
+                                        type:"toggleMediaState",
+                                        name,
+                                        playing:!playing
+                                    }),[playing])}
+                                />
+                            </Flex>
+                        ))
+                    }
+                </ScrollView>
+                <Flex position="absolute" bottom="1%" justifyContent="center" width="100%">
+                    <Button width="90%" m="auto" onPress={toggle} >
+                        Add New Clip
+                    </Button>
+                </Flex>
+            </View>
+            <Modal {...{open}} title="Add a new Timestamp"
+                handleToggle={toggle}
+            >
+                <AddNewTimestamp/>
+            </Modal>
+        </>
+    )
+};
+
 type Props = BottomTabScreenProps<RootStackParamList, "MediaDetail">;
 type RouteProps = Props['route']
 
@@ -129,6 +242,24 @@ const NoteTab = () => {
         toast
     })
     React.useEffect(() => {
+        formatTime.current = new TimeFormatter()
+    },[])
+    React.useEffect(() => {
+        if(state && state.isPlaying && body.length){
+            togglePlaying()
+        }
+    },[body])
+    React.useEffect(() => {
+        if(state?.positionMillis && state.positionMillis !== startTime){
+            setStartTime(state.positionMillis)
+        }
+    },[state])
+    React.useEffect(() => {
+        if(startTime){
+            setEndTime(startTime+7000)
+        }
+    },[startTime])
+    React.useEffect(() => {
         if (!foundPlaylist.id && playlistNote.length) {
             const foundIdx = playlistNote.findIndex(item => item.id === route.params.uri)
             if (foundIdx >= 0) {
@@ -147,25 +278,7 @@ const NoteTab = () => {
             }
         }
     }, [playlistNote])
-    React.useEffect(() => {
-        formatTime.current = new TimeFormatter()
-    },[])
-    React.useEffect(() => {
-        if(state?.positionMillis && state.positionMillis !== startTime){
-            setStartTime(state.positionMillis)
-        }
-    },[state])
-    React.useEffect(() => {
-        if(state && state.isPlaying && body.length){
-            togglePlaying()
-        }
-    },[body])
-    React.useEffect(() => {
-        if(startTime){
-            setEndTime(startTime+7000)
-        }
-    },[startTime])
-
+    
     
     const addToPlaylist = ({
         audioId, body, id, name, endTime, startTime
@@ -198,8 +311,8 @@ const NoteTab = () => {
             ...foundPlaylist,
             notes:foundPlaylist.notes.filter(item => item.id !== noteId)
         }
-        console.log("calling the delete functions")
         asyncStorage.addData(filteredPlaylist)
+        setFoundPlaylist(filteredPlaylist)
     }
 
     const onSubmit = async ({ body }: { body: string }) => {
@@ -351,7 +464,7 @@ const TabViewContainer = () => {
     };
 
     const renderScene = SceneMap({
-        first: FirstRoute,
+        first: MiniPlaylistRoute,
         second: NoteTab,
         third: ThirdRoute
     });

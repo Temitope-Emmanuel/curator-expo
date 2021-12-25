@@ -1,9 +1,9 @@
 import { NativeBaseProvider } from "native-base";
 import React from "react";
 import Views from "./src/views";
-import { FirebaseServiceProvider } from "./src/views/utils/firebase";
-import { MediaServiceProvider } from "./src/views/utils/mediaPlayer";
-import { NotificationProvider } from "./src/views/utils/notification";
+import { FirebaseServiceProvider } from "./src/utils/firebase";
+import { MediaServiceProvider } from "./src/utils/mediaPlayer";
+import { NotificationProvider } from "./src/utils/notification";
 
 const App = () => {
   return (

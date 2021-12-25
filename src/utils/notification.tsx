@@ -1,6 +1,6 @@
 import React from "react"
-import { createGenericContext } from "./hooks"
-import { INotification } from "../../models/notification"
+import { createGenericContext } from "./hooks/useGenericContext"
+import { INotification } from "../models/notification"
 import useFirebaseService from "./firebase"
 
 const [useNotification, NotificationContextProvider] = createGenericContext<{

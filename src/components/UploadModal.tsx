@@ -1,7 +1,7 @@
 import React from "react"
 import Modal from "./Modal"
 import * as fileSystem from "expo-file-system"
-import useFirebaseService from "../views/utils/firebase"
+import useFirebaseService from "../utils/firebase"
 import { Progress, Text, Spinner, useDisclose } from "native-base"
 import { IMedia } from "../models/Media"
 import { IToastProps } from "../models/Toast"

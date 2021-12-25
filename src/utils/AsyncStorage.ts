@@ -1,8 +1,8 @@
 import React from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IMedia,IMediaPlaylist } from "../../models/Media";
-import { IToastProps } from "../../models/Toast";
-import { IAudioNote,IPlaylistNotes } from "../../models/AudioNote";
+import { IMedia,IMediaPlaylist } from "../models/Media";
+import { IToastProps } from "../models/Toast";
+import { IAudioNote,IPlaylistNotes } from "../models/AudioNote";
 
 export type StorageType = IMedia<"audio"> | IMediaPlaylist | IPlaylistNotes
 type AcceptedKey = "@@media" | "@@playlist" | "@@playlistnote"

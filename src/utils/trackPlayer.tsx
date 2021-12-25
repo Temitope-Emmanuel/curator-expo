@@ -2,10 +2,9 @@ import { StorageType, useAsyncStorage } from "./AsyncStorage"
 import { useToast } from "native-base";
 import React from "react";
 import TrackPlayer,{Capability,RepeatMode} from "react-native-track-player"
-import { defaultMedia, IMedia, IMediaPlaylist } from "../../models/Media"
-import { IPlaylistState } from "../../models/PlaylistState";
-import { PlaylistClass } from "./Playlist";
-import { createGenericContext } from "./hooks";
+import { defaultMedia, IMedia, IMediaPlaylist } from "../models/Media"
+import { IPlaylistState } from "../models/PlaylistState";
+import { createGenericContext } from "./hooks/useGenericContext";
 
 
 

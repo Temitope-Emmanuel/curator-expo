@@ -7,7 +7,7 @@ import { Box } from "native-base"
 import { View, StyleSheet, Dimensions} from "react-native"
 import { PanGestureHandler, TapGestureHandler } from "react-native-gesture-handler";
 import MaskedView from "@react-native-community/masked-view"
-import { FULL_BAR_WIDTH, BAR_WIDTH, BAR_MARGIN } from "../views/utils/constants"
+import { FULL_BAR_WIDTH, BAR_WIDTH, BAR_MARGIN } from "../utils/constants"
 import * as ReactNativeSvg from "react-native-svg"
 
 const {Rect,Svg} = ReactNativeSvg

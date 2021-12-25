@@ -3,7 +3,7 @@ import { StyleSheet,Dimensions } from "react-native"
 import { Flex, View, IconButton, Text } from "native-base";
 import { IMedia } from "../models/Media";
 import { RootStackParamList } from "../models/route";
-import { FULL_BAR_WIDTH } from "./utils/constants"
+import { FULL_BAR_WIDTH } from "../utils/constants"
 import {
     useSharedValue, withTiming
 } from "react-native-reanimated";
@@ -11,13 +11,10 @@ import waveFormSamples from "../assets/data/waveform.json"
 import TabView from "../../src/components/TabView"
 import WaveFormContainer from "../components/WaveFormContainer";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import useMediaService from "./utils/mediaPlayer";
+import useMediaService from "../utils/mediaPlayer";
 import { useNavigation } from "@react-navigation/core";
 import {FontAwesome5} from "@expo/vector-icons"
 import { ToggleComponent } from "../components/ToggleComponent";
-
-const {width} = Dimensions.get("window")
-
 
 const MediaDetail: React.FC<{} & BottomTabScreenProps<RootStackParamList,"MediaDetail">> = ({
     route
@@ -33,21 +30,21 @@ const MediaDetail: React.FC<{} & BottomTabScreenProps<RootStackParamList,"MediaD
 
         const setUpPlaylist = async () => {
             const newMedia = await getAudio(route.params.uri) as IMedia<"audio">
-            if(newMedia.id){
+            if(newMedia?.id){
                 console.log("we are here",{newMedia})
                 changeTrack(newMedia as IMedia<"audio">)   
             }
         }
 
         React.useEffect(() => {
-            const unsubscribe = navigation.addListener("focus",() => {
-                if(currentMedia?.id !== route.params.uri){
-                    setUpPlaylist()
-                }else{
+            // const unsubscribe = navigation.addListener("focus",() => {
+            //     if(currentMedia?.id !== route.params.uri){
+            //         setUpPlaylist()
+            //     }else{
 
-                }
-            })
-            return unsubscribe
+            //     }
+            // })
+            // return unsubscribe
         },[navigation])
 
         const updatePosition = (currentTime: number) => {
@@ -74,7 +71,6 @@ const MediaDetail: React.FC<{} & BottomTabScreenProps<RootStackParamList,"MediaD
                 }
             }
         }, [state])
-
         
         return (
             <View style={styles.container}>

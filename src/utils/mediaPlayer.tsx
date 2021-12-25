@@ -1,11 +1,11 @@
 import React from "react"
-import { createGenericContext } from "./hooks"
-import { defaultMedia, IMedia, IMediaPlaylist } from "../../models/Media"
+import { createGenericContext } from "./hooks/useGenericContext"
+import { defaultMedia, IMedia, IMediaPlaylist } from "../models/Media"
 import { useToast } from "native-base"
 import { StorageType, useAsyncStorage } from "./AsyncStorage"
 import { PlaylistClass } from "./Playlist"
-import waveform from "../../assets/data/waveform.json"
-import { IPlaylistState } from "../../models/PlaylistState"
+import waveform from "../assets/data/waveform.json"
+import { IPlaylistState } from "../models/PlaylistState"
 
 const [useMediaService, MediaServiceContextProvider] = createGenericContext<{
     getAudio: (mediaId:string) => Promise<StorageType>;

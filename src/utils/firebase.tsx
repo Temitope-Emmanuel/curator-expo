@@ -1,9 +1,9 @@
 import React from "react"
 import firebase from "firebase"
 import Firebase, {createFirebase} from "./firebaseClass"
-import { createGenericContext } from "./hooks"
+import { createGenericContext } from "./hooks/useGenericContext"
 import { useToast } from "native-base"
-import { IAccount } from "../../models/Account"
+import { IAccount } from "../models/Account"
 
 
 const [useFirebaseService,FirebaseServiceContextProvider] = createGenericContext<{

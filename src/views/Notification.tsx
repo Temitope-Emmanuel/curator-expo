@@ -3,8 +3,8 @@ import { Flex,Text } from "native-base"
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
 import { RootStackParamList } from "../models/route"
 import Alert from "../components/Alert"
-import useNotification from "./utils/notification"
-import useFirebaseService from "./utils/firebase"
+import useNotification from "../utils/notification"
+import useFirebaseService from "../utils/firebase"
 
 
 const Notification:React.FC<{

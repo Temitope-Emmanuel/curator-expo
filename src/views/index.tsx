@@ -5,13 +5,13 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import Home from "./Home"
 import MediaDetail from "./MediaDetail";
 import Notification from "./Notification"
-import { FastIOSTransitionSpec } from "./utils/transitions"
+import { FastIOSTransitionSpec } from "../utils/transitions"
 import {AntDesign,Ionicons,MaterialIcons} from "@expo/vector-icons"
 import { IconButton,Icon, Flex } from "native-base"
 import { RootStackParamList } from "../models/route"
-import useNotification from "./utils/notification"
-import useMediaService from "./utils/mediaPlayer"
-import { MediaLayoutProvider } from "./utils/mediaLayout"
+import useNotification from "../utils/notification"
+import useMediaService from "../utils/mediaPlayer"
+import { MediaLayoutProvider } from "../utils/mediaLayout"
 
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
