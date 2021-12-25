@@ -1,4 +1,4 @@
-export interface IAudioNote {
+export interface INote {
     body:string;
     startTime:number;
     endTime:number;
@@ -7,8 +7,8 @@ export interface IAudioNote {
     id:string
 }
 
-export interface IPlaylistNotes {
+export interface IMediaNotes {
     id:string;
-    notes:IAudioNote[]
+    notes:INote[]
 }[]
   

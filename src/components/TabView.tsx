@@ -5,15 +5,15 @@ import Constants from 'expo-constants';
 import { Foundation, FontAwesome, MaterialIcons } from "@expo/vector-icons"
 import { Flex, Icon, IconButton,
     Button, useToast, Pressable, 
-    Text, HStack, Badge, useDisclose, 
-    TextArea
+    Text, HStack, Badge, useDisclose
     } from 'native-base';
 import Input from './Input';
+import TextArea from "./Textarea"
 import { useForm } from 'react-hook-form';
 import { AntDesign } from "@expo/vector-icons"
 import { useAsyncStorage } from '../utils/AsyncStorage';
 import { useRoute } from '@react-navigation/native';
-import { IAudioNote, IPlaylistNotes } from '../models/AudioNote';
+import { INote, IMediaNotes } from '../models/AudioNote';
 import { RootStackParamList } from "../models/route"
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import useMediaService from '../utils/mediaPlayer';
@@ -22,6 +22,10 @@ import { TimeFormatter } from '../utils/Playlist';
 import { useTime } from '../utils/hooks/useTime';
 import MiniPlayer from './MiniPlayer';
 import Modal from './Modal';
+import { Slider } from './Slider';
+import {Feather} from "@expo/vector-icons"
+import { IToastProps } from '../models/Toast';
+import { IAudioTimestamp } from '../models/AudioTimestamp';
 
 const musicData = [
     {
@@ -72,32 +76,152 @@ function reducer(state:ReturnType<typeof initialState>,action:{
             throw new Error("Invalid action type argument")
     }
 }
-
 interface ITimestamp {
     title:string;
     description:string
 }
 
-const AddNewTimestamp = () => {
+const TimeSpan:React.FC<{
+    startTime:string;
+    endTime:string;
+    decreaseStartTime:() => void;
+    increaseStartTime:() => void;
+    increaseEndTime:() => void;
+    decreaseEndTime:() => void;
+}> = ({
+    decreaseEndTime,decreaseStartTime,startTime,endTime,
+    increaseEndTime,increaseStartTime
+}) => {
+
+    return(
+        <Flex w="100%" flexDirection="row" backgroundColor="blue.100">
+            <Flex flexDirection="row">
+                <IconButton
+                    _icon={{
+                        onPress:decreaseStartTime,
+                        as:MaterialIcons,
+                        name:"remove",
+                        size:"sm",
+                        height:1,
+                        width:1  
+                    }}
+                />
+                <Badge justifyContent="center">
+                    {startTime}
+                </Badge>
+                <IconButton
+                    _icon={{
+                        onPress:increaseStartTime,
+                        as:MaterialIcons,
+                        name:"add",
+                        size:"sm",
+                        height:1,
+                        width:1  
+                    }}
+                />
+            </Flex>
+            <Flex alignItems={"center"}>
+                <Feather name="git-commit" />
+            </Flex>
+            <Flex flexDirection="row">
+                <IconButton
+                    _icon={{
+                        onPress:decreaseEndTime,
+                        as:MaterialIcons,
+                        name:"remove",
+                        size:"sm",
+                        height:1,
+                        width:1  
+                    }}
+                />
+                <Badge justifyContent="center">
+                    {endTime}
+                </Badge>
+                <IconButton
+                    _icon={{
+                        onPress:increaseEndTime,
+                        as:MaterialIcons,
+                        name:"add",
+                        size:"sm",
+                        height:1,
+                        width:1  
+                    }}
+                />
+            </Flex>
+        </Flex>
+    )
+}
+
+
+const AddNewTimestamp:React.FC<{
+    toast:IToastProps
+}> = ({
+    toast
+}) => {
     const { control, formState, handleSubmit } = useForm<ITimestamp>({
         defaultValues: {
             title:"",
             description:""
         }
     })
+    const [playlistNote, asyncStorage] = useAsyncStorage<IAudioTimestamp>({
+        initialState: [],
+        key: "@@playlistnote",
+        toast
+    })
+    const progressData = {
+        position:100,
+        duration:1000,
+        buffered:400
+    }
+    const formatTime = React.useRef<TimeFormatter>()
+    const [progress,setProgress] = React.useState(progressData)
+    const [onChangeValue, setOnChangeValue] = React.useState(70)
+    const [startTime,increaseStartTime,decreaseStartTime,setStartTime] = useTime(0)
+    const [endTime,increaseEndTime,decreaseEndTime,setEndTime] = useTime(0)
+
+    React.useEffect(() => {
+        formatTime.current = new TimeFormatter()
+    },[])
+
+    const handleSliderChange = (e:number) => {
+        setProgress({
+            ...progress,
+            position:(e/100) * progress.duration
+        })
+    }
+
+    console.log(progress.position)
+
     return(
         <>
-            <Input control={control} name="title"
+            <Slider mb={2} value={(progress.position/progress.duration) * 100}
+                minValue={0} maxValue={100} defaultValue={70}
+                onChange={handleSliderChange}
+            >
+                <Slider.Track>
+                    <Slider.FilledTrack />
+                </Slider.Track>
+                    <Slider.Thumb />
+            </Slider>
+            <TimeSpan {...{increaseStartTime,decreaseStartTime,increaseEndTime,decreaseEndTime}}
+             startTime={formatTime.current?.getMMSSFromMillis(progress.position*1000)}
+             endTime={formatTime.current?.getMMSSFromMillis((progress.position + 300)*1000)}
+            />
+            <Input control={control} name="title" containerStyle={{marginTop:10,marginBottom:10}}
                 placeholder="Input Timestamp title"
             />
-            <TextArea h={20} mt={2}
-            placeholder="Add New Description"/>
+            <TextArea containerStyle={{marginTop:2}}
+             {...{control}} name="description"
+             placeholder="Add New Description"
+            />
         </>
     )
 }
 
-const MiniPlaylistRoute = () => {
+const TimestampRoute = () => {
     const [state,dispatch] = React.useReducer(reducer,musicData,initialState)
+    const toast = useToast()
     const {isOpen:open,onToggle:toggle} = useDisclose()
     
     return(
@@ -127,7 +251,7 @@ const MiniPlaylistRoute = () => {
             <Modal {...{open}} title="Add a new Timestamp"
                 handleToggle={toggle}
             >
-                <AddNewTimestamp/>
+                <AddNewTimestamp {...{toast}} />
             </Modal>
         </>
     )
@@ -172,7 +296,7 @@ const HiddenItem:React.FC<{
 }
 
 const NoteContainer: React.FC<{
-    notes: IAudioNote[];
+    notes: INote[];
     handleDelete:(noteId:string) => void;
     formatTime:TimeFormatter
 }> = ({
@@ -232,11 +356,11 @@ const NoteTab = () => {
     const body = watch("body")
     const route = useRoute<RouteProps>()
     const formatTime = React.useRef<TimeFormatter>()
-    const [foundPlaylist, setFoundPlaylist] = React.useState<IPlaylistNotes>({
+    const [foundPlaylist, setFoundPlaylist] = React.useState<IMediaNotes>({
         id: "",
         notes: []
     })
-    const [playlistNote, asyncStorage] = useAsyncStorage<IPlaylistNotes>({
+    const [playlistNote, asyncStorage] = useAsyncStorage<IMediaNotes>({
         initialState: [],
         key: "@@playlistnote",
         toast
@@ -282,8 +406,8 @@ const NoteTab = () => {
     
     const addToPlaylist = ({
         audioId, body, id, name, endTime, startTime
-    }: IAudioNote) => {
-        const newNotes: IAudioNote = {
+    }: INote) => {
+        const newNotes: INote = {
             id,
             name,
             body,
@@ -331,63 +455,17 @@ const NoteTab = () => {
 
     return (
         <View style={[styles.container, { backgroundColor: 'whitesmoke', position: "relative" }]}>
-            <NoteContainer formatTime={formatTime.current} handleDelete={handleDelete} notes={foundPlaylist.notes} />
+            <NoteContainer formatTime={formatTime.current} handleDelete={handleDelete}
+             notes={foundPlaylist.notes} />
             <Flex bg="whitesmoke" position="absolute" bottom={0} left={0} width="100%">
-                <Flex w="100%" flexDirection="row" backgroundColor="blue.100">
-                    <Flex flexDirection="row">
-                        <IconButton
-                            _icon={{
-                                onPress:decreaseStartTime,
-                                as:MaterialIcons,
-                                name:"remove",
-                                size:"sm",
-                                height:1,
-                                width:1  
-                            }}
-                        />
-                        <Badge justifyContent="center">
-                            {`${formatTime.current?.getMMSSFromMillis(startTime) ?? '00:00'}`}
-                        </Badge>
-                        <IconButton
-                            _icon={{
-                                onPress:increaseStartTime,
-                                as:MaterialIcons,
-                                name:"add",
-                                size:"sm",
-                                height:1,
-                                width:1  
-                            }}
-                        />
-                    </Flex>
-                    <Text>
-                        ---
-                    </Text>
-                    <Flex flexDirection="row">
-                        <IconButton
-                            _icon={{
-                                onPress:decreaseEndTime,
-                                as:MaterialIcons,
-                                name:"remove",
-                                size:"sm",
-                                height:1,
-                                width:1  
-                            }}
-                        />
-                        <Badge justifyContent="center">
-                            {`${formatTime.current?.getMMSSFromMillis(endTime) ?? '00:00'}`}
-                        </Badge>
-                        <IconButton
-                            _icon={{
-                                onPress:increaseEndTime,
-                                as:MaterialIcons,
-                                name:"add",
-                                size:"sm",
-                                height:1,
-                                width:1  
-                            }}
-                        />
-                    </Flex>
-                </Flex>
+                <TimeSpan 
+                    startTime={`${formatTime.current?.getMMSSFromMillis(startTime) ?? '00:00'}`}
+                    endTime={`${formatTime.current?.getMMSSFromMillis(endTime) ?? '00:00'}`}
+                    {...{
+                        increaseStartTime,decreaseStartTime,
+                        increaseEndTime,decreaseEndTime
+                    }}
+                />
                 <Input control={control} name="body"
                     placeholder="Write something"
                     rightIcon={
@@ -418,7 +496,7 @@ const getIcon = (arg: "0" | "1" | "2") => {
 }
 
 const TabViewContainer = () => {
-    const [idx, setIndex] = React.useState(1)
+    const [idx, setIndex] = React.useState(0)
     const [routes] = React.useState([
         { key: 'first', title: 'Notes' },
         { key: 'second', title: 'Timestamp' },
@@ -464,7 +542,7 @@ const TabViewContainer = () => {
     };
 
     const renderScene = SceneMap({
-        first: MiniPlaylistRoute,
+        first: TimestampRoute,
         second: NoteTab,
         third: ThirdRoute
     });
